@@ -1,0 +1,149 @@
+import { z } from 'zod';
+
+export const factorConfigSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  weight: z.number().min(0).max(1),
+  description: z.string(),
+  subFactors: z.array(
+    z.object({
+      id: z.string(),
+      name: z.string(),
+      maxPoints: z.number(),
+    })
+  ),
+});
+
+export const thresholdSchema = z.object({
+  platinum: z.number(),
+  gold: z.number(),
+  silver: z.number(),
+  bronze: z.number(),
+  insufficientData: z.number().default(4),
+});
+
+export const methodologySchema = z.object({
+  version: z.string(),
+  factors: z.array(factorConfigSchema),
+  thresholds: thresholdSchema,
+  changelog: z.string(),
+});
+
+export type MethodologyConfig = z.infer<typeof methodologySchema>;
+
+export const DEFAULT_METHODOLOGY: MethodologyConfig = {
+  version: '1.0.0',
+  factors: [
+    {
+      id: 'securityAudits',
+      name: 'Security Audits',
+      weight: 0.20,
+      description: 'Direct measure of code security through professional audits',
+      subFactors: [
+        { id: 'hasAudit', name: 'Has Audit', maxPoints: 30 },
+        { id: 'auditRecency', name: 'Audit Recency', maxPoints: 25 },
+        { id: 'auditorReputation', name: 'Auditor Reputation', maxPoints: 25 },
+        { id: 'auditScope', name: 'Audit Scope', maxPoints: 10 },
+        { id: 'multipleAudits', name: 'Multiple Audits', maxPoints: 10 },
+      ],
+    },
+    {
+      id: 'proofOfReserves',
+      name: 'Proof of Reserves',
+      weight: 0.15,
+      description: 'Solvency verification for custodial services',
+      subFactors: [
+        { id: 'hasProof', name: 'Has Proof', maxPoints: 20 },
+        { id: 'verificationMethod', name: 'Verification Method', maxPoints: 30 },
+        { id: 'coverageRatio', name: 'Coverage Ratio', maxPoints: 30 },
+        { id: 'freshness', name: 'Freshness', maxPoints: 10 },
+        { id: 'liabilitiesScope', name: 'Liabilities Scope', maxPoints: 10 },
+      ],
+    },
+    {
+      id: 'trackRecord',
+      name: 'Track Record',
+      weight: 0.15,
+      description: 'Historical performance and uptime',
+      subFactors: [
+        { id: 'yearsOperating', name: 'Years Operating', maxPoints: 20 },
+        { id: 'uptimePercent', name: 'Uptime', maxPoints: 25 },
+        { id: 'volumeHandled', name: 'Volume Handled', maxPoints: 15 },
+        { id: 'majorIncidents', name: 'No Major Incidents', maxPoints: 25 },
+        { id: 'communitySentiment', name: 'Community Reputation', maxPoints: 15 },
+      ],
+    },
+    {
+      id: 'teamTransparency',
+      name: 'Team Transparency',
+      weight: 0.12,
+      description: 'Accountability and reputational stake of team',
+      subFactors: [
+        { id: 'namedMembers', name: 'Named Members', maxPoints: 25 },
+        { id: 'verifiableProfiles', name: 'Verifiable Profiles', maxPoints: 20 },
+        { id: 'publicCommunications', name: 'Public Communications', maxPoints: 15 },
+        { id: 'hasLegalEntity', name: 'Company Registration', maxPoints: 20 },
+        { id: 'teamTrackRecord', name: 'Team Track Record', maxPoints: 20 },
+      ],
+    },
+    {
+      id: 'insurance',
+      name: 'Insurance Coverage',
+      weight: 0.10,
+      description: 'Protection against losses',
+      subFactors: [
+        { id: 'hasInsurance', name: 'Has Insurance', maxPoints: 30 },
+        { id: 'coverageToAUM', name: 'Coverage to AUM', maxPoints: 40 },
+        { id: 'insurerReputation', name: 'Insurer Reputation', maxPoints: 15 },
+        { id: 'publiclyVerifiable', name: 'Publicly Verifiable', maxPoints: 15 },
+      ],
+    },
+    {
+      id: 'regulatoryCompliance',
+      name: 'Regulatory Compliance',
+      weight: 0.10,
+      description: 'Legal standing and compliance',
+      subFactors: [
+        { id: 'licenseCount', name: 'Licenses Held', maxPoints: 30 },
+        { id: 'hasKycAml', name: 'KYC/AML', maxPoints: 20 },
+        { id: 'regulatoryViolations', name: 'Clean History', maxPoints: 20 },
+        { id: 'jurisdictionQuality', name: 'Jurisdiction Quality', maxPoints: 15 },
+        { id: 'hasLegalTransparency', name: 'Legal Transparency', maxPoints: 15 },
+      ],
+    },
+    {
+      id: 'openSource',
+      name: 'Open Source Status',
+      weight: 0.08,
+      description: 'Transparency and auditability of code',
+      subFactors: [
+        { id: 'hasRepository', name: 'Public Repository', maxPoints: 20 },
+        { id: 'commitActivity', name: 'Code Activity', maxPoints: 20 },
+        { id: 'testCoverage', name: 'Test Coverage', maxPoints: 15 },
+        { id: 'contributorCount', name: 'Contributors', maxPoints: 15 },
+        { id: 'documentationQuality', name: 'Documentation', maxPoints: 15 },
+        { id: 'hasBugBounty', name: 'Bug Bounty', maxPoints: 15 },
+      ],
+    },
+    {
+      id: 'incidentHistory',
+      name: 'Incident History',
+      weight: 0.10,
+      description: 'Past failures and response quality',
+      subFactors: [
+        { id: 'totalIncidents', name: 'No Incidents', maxPoints: 40 },
+        { id: 'severityDistribution', name: 'Severity Distribution', maxPoints: 25 },
+        { id: 'avgResponseQuality', name: 'Response Quality', maxPoints: 20 },
+        { id: 'avgRecoveryDays', name: 'Recovery Time', maxPoints: 15 },
+      ],
+    },
+  ],
+  thresholds: {
+    platinum: 90,
+    gold: 75,
+    silver: 60,
+    bronze: 40,
+    insufficientData: 4,
+  },
+  changelog: 'Initial methodology. 8 trust factors with weighted scoring.',
+};

@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Trust Registry — Point Woebegone</title>
+  <meta name="description" content="Open-source crypto trust scoring. No black boxes. A public good.">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            bg: '#0A0A0B',
+            surface: '#141416',
+            surface2: '#1C1C1F',
+            border: '#2A2A2D',
+            muted: '#71717A',
+            accent: '#C0392B',
+            gold: '#F59E0B',
+            silver: '#94A3B8',
+            bronze: '#D97706',
+            platinum: '#A78BFA',
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body { background: #0A0A0B; color: #E4E4E7; font-family: 'Inter', system-ui, sans-serif; }
+    .grade-platinum { color: #A78BFA; }
+    .grade-gold { color: #F59E0B; }
+    .grade-silver { color: #94A3B8; }
+    .grade-bronze { color: #D97706; }
+    .grade-unscored { color: #71717A; }
+    .score-ring { transition: stroke-dashoffset 1s ease-out; }
+    .fade-in { animation: fadeIn 0.3s ease-out; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+    .factor-bar { transition: width 0.8s ease-out; }
+    .skeleton { background: linear-gradient(90deg, #1C1C1F 25%, #2A2A2D 50%, #1C1C1F 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; }
+    @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+  </style>
+</head>
+<body class="min-h-screen">
+  <div id="app"></div>
+  <script type="module" src="/app.js"></script>
+</body>
+</html>
