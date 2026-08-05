@@ -1,8 +1,8 @@
 import { getDb } from '../src/config/database.js';
 import { services } from '../src/db/schema/services.js';
-import { serviceScores } from '../src/db/schema/scores.js';
 
 const SEED_SERVICES = [
+  // Exchanges
   {
     id: 'binance',
     name: 'Binance',
@@ -13,7 +13,8 @@ const SEED_SERVICES = [
     foundedYear: 2017,
     headquarters: 'Cayman Islands',
     legalEntity: 'Binance Holdings Ltd',
-    tags: ['cex', 'global', 'derivatives'],
+    tags: JSON.stringify(['cex', 'global', 'derivatives']),
+    addresses: JSON.stringify({}),
   },
   {
     id: 'coinbase',
@@ -25,7 +26,8 @@ const SEED_SERVICES = [
     foundedYear: 2012,
     headquarters: 'San Francisco, USA',
     legalEntity: 'Coinbase Global Inc',
-    tags: ['cex', 'regulated', 'public-company'],
+    tags: JSON.stringify(['cex', 'regulated', 'public-company']),
+    addresses: JSON.stringify({}),
   },
   {
     id: 'kraken',
@@ -37,8 +39,75 @@ const SEED_SERVICES = [
     foundedYear: 2011,
     headquarters: 'San Francisco, USA',
     legalEntity: 'Payward Inc',
-    tags: ['cex', 'regulated', 'derivatives'],
+    tags: JSON.stringify(['cex', 'regulated', 'derivatives']),
+    addresses: JSON.stringify({}),
   },
+  {
+    id: 'bybit',
+    name: 'Bybit',
+    slug: 'bybit',
+    category: 'exchange',
+    website: 'https://bybit.com',
+    description: 'Cryptocurrency derivatives exchange',
+    foundedYear: 2018,
+    headquarters: 'Dubai, UAE',
+    legalEntity: 'Bybit Fintech Ltd',
+    tags: JSON.stringify(['cex', 'derivatives', 'global']),
+    addresses: JSON.stringify({}),
+  },
+  {
+    id: 'okx',
+    name: 'OKX',
+    slug: 'okx',
+    category: 'exchange',
+    website: 'https://okx.com',
+    description: 'Global cryptocurrency exchange and Web3 ecosystem',
+    foundedYear: 2017,
+    headquarters: 'Seychelles',
+    legalEntity: 'OKX Holdings Ltd',
+    tags: JSON.stringify(['cex', 'web3', 'global']),
+    addresses: JSON.stringify({}),
+  },
+  {
+    id: 'bitfinex',
+    name: 'Bitfinex',
+    slug: 'bitfinex',
+    category: 'exchange',
+    website: 'https://bitfinex.com',
+    description: 'Cryptocurrency exchange known for advanced trading',
+    foundedYear: 2012,
+    headquarters: 'Hong Kong',
+    legalEntity: 'iFinex Inc',
+    tags: JSON.stringify(['cex', 'advanced', 'global']),
+    addresses: JSON.stringify({}),
+  },
+  {
+    id: 'gate-io',
+    name: 'Gate.io',
+    slug: 'gate-io',
+    category: 'exchange',
+    website: 'https://gate.io',
+    description: 'Global cryptocurrency exchange with wide token selection',
+    foundedYear: 2013,
+    headquarters: 'Cayman Islands',
+    legalEntity: 'Gate Technology Inc',
+    tags: JSON.stringify(['cex', 'global', 'altcoins']),
+    addresses: JSON.stringify({}),
+  },
+  {
+    id: 'kucoin',
+    name: 'KuCoin',
+    slug: 'kucoin',
+    category: 'exchange',
+    website: 'https://kucoin.com',
+    description: 'Global cryptocurrency exchange',
+    foundedYear: 2017,
+    headquarters: 'Seychelles',
+    legalEntity: 'Mek Global Ltd',
+    tags: JSON.stringify(['cex', 'global', 'altcoins']),
+    addresses: JSON.stringify({}),
+  },
+  // Wallets
   {
     id: 'metamask',
     name: 'MetaMask',
@@ -48,8 +117,22 @@ const SEED_SERVICES = [
     description: 'Leading self-custody crypto wallet',
     foundedYear: 2016,
     legalEntity: 'Consensys AG',
-    tags: ['wallet', 'web3', 'defi'],
+    tags: JSON.stringify(['wallet', 'web3', 'defi']),
+    addresses: JSON.stringify({}),
   },
+  {
+    id: 'phantom',
+    name: 'Phantom',
+    slug: 'phantom',
+    category: 'wallet',
+    website: 'https://phantom.app',
+    description: 'Multi-chain wallet for Solana, Ethereum, and Bitcoin',
+    foundedYear: 2021,
+    legalEntity: 'Phantom Technologies Inc',
+    tags: JSON.stringify(['wallet', 'solana', 'web3']),
+    addresses: JSON.stringify({}),
+  },
+  // Hardware wallets
   {
     id: 'ledger',
     name: 'Ledger',
@@ -60,8 +143,23 @@ const SEED_SERVICES = [
     foundedYear: 2014,
     headquarters: 'Paris, France',
     legalEntity: 'Ledger SAS',
-    tags: ['hardware', 'security', 'self-custody'],
+    tags: JSON.stringify(['hardware', 'security', 'self-custody']),
+    addresses: JSON.stringify({}),
   },
+  {
+    id: 'trezor',
+    name: 'Trezor',
+    slug: 'trezor',
+    category: 'hardware_wallet',
+    website: 'https://trezor.io',
+    description: 'Original hardware wallet manufacturer',
+    foundedYear: 2013,
+    headquarters: 'Prague, Czech Republic',
+    legalEntity: 'SatoshiLabs s.r.o.',
+    tags: JSON.stringify(['hardware', 'security', 'self-custody', 'open-source']),
+    addresses: JSON.stringify({}),
+  },
+  // DeFi
   {
     id: 'lido',
     name: 'Lido',
@@ -70,7 +168,8 @@ const SEED_SERVICES = [
     website: 'https://lido.fi',
     description: 'Liquid staking protocol for Ethereum',
     foundedYear: 2020,
-    tags: ['defi', 'staking', 'ethereum'],
+    tags: JSON.stringify(['defi', 'staking', 'ethereum']),
+    addresses: JSON.stringify({}),
   },
   {
     id: 'aave',
@@ -80,7 +179,8 @@ const SEED_SERVICES = [
     website: 'https://aave.com',
     description: 'Open source decentralized lending protocol',
     foundedYear: 2020,
-    tags: ['defi', 'lending', 'governance'],
+    tags: JSON.stringify(['defi', 'lending', 'governance']),
+    addresses: JSON.stringify({}),
   },
   {
     id: 'uniswap',
@@ -90,18 +190,44 @@ const SEED_SERVICES = [
     website: 'https://uniswap.org',
     description: 'Decentralized exchange protocol on Ethereum',
     foundedYear: 2018,
-    tags: ['defi', 'dex', 'ethereum'],
+    tags: JSON.stringify(['defi', 'dex', 'ethereum']),
+    addresses: JSON.stringify({}),
   },
   {
-    id: 'bridge-stargate',
+    id: 'makerdao',
+    name: 'MakerDAO',
+    slug: 'makerdao',
+    category: 'defi',
+    website: 'https://makerdao.com',
+    description: 'Decentralized stablecoin (DAI) protocol',
+    foundedYear: 2017,
+    tags: JSON.stringify(['defi', 'stablecoin', 'governance']),
+    addresses: JSON.stringify({}),
+  },
+  {
+    id: 'compound',
+    name: 'Compound',
+    slug: 'compound',
+    category: 'defi',
+    website: 'https://compound.finance',
+    description: 'Decentralized lending and borrowing protocol',
+    foundedYear: 2018,
+    tags: JSON.stringify(['defi', 'lending', 'governance']),
+    addresses: JSON.stringify({}),
+  },
+  // Bridges
+  {
+    id: 'stargate',
     name: 'Stargate',
     slug: 'stargate',
     category: 'bridge',
     website: 'https://stargate.finance',
     description: 'Cross-chain bridge protocol',
     foundedYear: 2022,
-    tags: ['bridge', 'cross-chain', 'defi'],
+    tags: JSON.stringify(['bridge', 'cross-chain', 'defi']),
+    addresses: JSON.stringify({}),
   },
+  // Custodians
   {
     id: 'bitgo',
     name: 'BitGo',
@@ -112,29 +238,29 @@ const SEED_SERVICES = [
     foundedYear: 2013,
     headquarters: 'Palo Alto, USA',
     legalEntity: 'BitGo Inc',
-    tags: ['custody', 'institutional', 'qualified-custodian'],
+    tags: JSON.stringify(['custody', 'institutional', 'qualified-custodian']),
+    addresses: JSON.stringify({}),
+  },
+  {
+    id: 'fireblocks',
+    name: 'Fireblocks',
+    slug: 'fireblocks',
+    category: 'custodian',
+    website: 'https://fireblocks.com',
+    description: 'Enterprise digital asset custody and operations',
+    foundedYear: 2018,
+    headquarters: 'New York, USA',
+    legalEntity: 'Fireblocks Inc',
+    tags: JSON.stringify(['custody', 'institutional', 'enterprise']),
+    addresses: JSON.stringify({}),
   },
 ];
 
-const SEED_SCORES: Record<string, { score: number; grade: string; confidence: number }> = {
-  binance: { score: 72, grade: 'silver', confidence: 0.85 },
-  coinbase: { score: 81, grade: 'gold', confidence: 0.92 },
-  kraken: { score: 79, grade: 'gold', confidence: 0.88 },
-  metamask: { score: 68, grade: 'silver', confidence: 0.75 },
-  ledger: { score: 74, grade: 'silver', confidence: 0.82 },
-  lido: { score: 65, grade: 'silver', confidence: 0.70 },
-  aave: { score: 71, grade: 'silver', confidence: 0.72 },
-  uniswap: { score: 70, grade: 'silver', confidence: 0.71 },
-  'bridge-stargate': { score: 45, grade: 'bronze', confidence: 0.45 },
-  bitgo: { score: 76, grade: 'gold', confidence: 0.80 },
-};
-
 async function seed() {
-  console.log('Seeding database...');
+  console.log('Seeding database (services only — no fake scores)...');
 
   const db = getDb();
 
-  // Insert services
   for (const service of SEED_SERVICES) {
     await db
       .insert(services)
@@ -147,23 +273,7 @@ async function seed() {
   }
 
   console.log(`Inserted ${SEED_SERVICES.length} services`);
-
-  // Insert scores
-  for (const [serviceId, score] of Object.entries(SEED_SCORES)) {
-    await db
-      .insert(serviceScores)
-      .values({
-        serviceId,
-        overallScore: score.score,
-        grade: score.grade,
-        confidence: score.confidence,
-        methodologyVersion: '1.0.0',
-      })
-      .onConflictDoNothing();
-  }
-
-  console.log(`Inserted ${Object.keys(SEED_SCORES).length} scores`);
-  console.log('Seed complete!');
+  console.log('Seed complete! Scores will be computed by the scoring pipeline.');
 }
 
 seed().catch((err) => {

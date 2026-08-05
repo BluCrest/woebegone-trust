@@ -1,27 +1,36 @@
-import { Queue } from 'bullmq';
-import { getRedis } from '../config/redis.js';
 import { getLogger } from '../utils/logger.js';
 
-let _queues: {
-  dataRefresh: Queue;
-  scoreRecalculation: Queue;
-} | null = null;
+let _queues: any = null;
+let _redisAvailable = false;
 
 export function getQueues() {
-  if (!_queues) {
+  if (_queues) return _queues;
+  try {
+    const { Queue } = require('bullmq');
+    const { getRedis } = require('../config/redis.js');
     const connection = getRedis();
     _queues = {
       dataRefresh: new Queue('data-refresh', { connection: connection.duplicate() }),
       scoreRecalculation: new Queue('score-recalculation', { connection: connection.duplicate() }),
     };
+    _redisAvailable = true;
+  } catch {
+    _redisAvailable = false;
   }
   return _queues;
 }
 
+export function isRedisAvailable() {
+  return _redisAvailable;
+}
+
 export async function addDataRefreshJob(serviceId: string) {
   const queues = getQueues();
+  if (!queues) {
+    getLogger().warn({ serviceId }, 'Redis unavailable, skipping data refresh job');
+    return;
+  }
   const logger = getLogger();
-
   await queues.dataRefresh.add(
     'refresh-service',
     { serviceId },
@@ -32,14 +41,16 @@ export async function addDataRefreshJob(serviceId: string) {
       removeOnFail: 50,
     }
   );
-
   logger.info({ serviceId }, 'Data refresh job queued');
 }
 
 export async function addScoreRecalculationJob(serviceId: string) {
   const queues = getQueues();
+  if (!queues) {
+    getLogger().warn({ serviceId }, 'Redis unavailable, skipping score recalculation job');
+    return;
+  }
   const logger = getLogger();
-
   await queues.scoreRecalculation.add(
     'recalculate',
     { serviceId },
@@ -50,6 +61,5 @@ export async function addScoreRecalculationJob(serviceId: string) {
       removeOnFail: 50,
     }
   );
-
   logger.info({ serviceId }, 'Score recalculation job queued');
 }

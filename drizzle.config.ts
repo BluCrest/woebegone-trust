@@ -3,8 +3,8 @@ import { defineConfig } from 'drizzle-kit';
 export default defineConfig({
   schema: './src/db/schema/*',
   out: './src/db/migrations',
-  dialect: 'postgresql',
+  dialect: 'sqlite',
   dbCredentials: {
-    url: process.env.DATABASE_URL!,
+    url: process.env.DATABASE_URL || './data/woebegone.db',
   },
 });

@@ -31,7 +31,7 @@ export async function verificationRoutes(app: FastifyInstance) {
         id,
         serviceId,
         requestedTier,
-        evidence: evidence || {},
+        evidence: JSON.stringify(evidence || {}),
         status: 'pending',
       })
       .returning();

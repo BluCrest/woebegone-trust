@@ -1,6 +1,9 @@
 import type { FactorData } from '../scoring/scoring.types.js';
 import { fetchExchangeData } from './collectors/api/coingecko.js';
 import { fetchAddressBalance, fetchContractVerification } from './collectors/on-chain/etherscan.js';
+import { fetchGitHubRepo } from './collectors/api/github.js';
+import { fetchProtocolTVL } from './collectors/api/defillama.js';
+import { getAuditRegistry } from './collectors/curated/audit-registry.js';
 import { getLogger } from '../../utils/logger.js';
 
 export interface CollectorResult {
@@ -10,6 +13,25 @@ export interface CollectorResult {
   confidence: number;
   collectedAt: Date;
 }
+
+const GITHUB_REPOS: Record<string, string> = {
+  uniswap: 'Uniswap/v3-core',
+  aave: 'aave/aave-v3-core',
+  lido: 'lidofinance/lido-dao',
+  metamask: 'MetaMask/metamask-extension',
+  stargate: 'stargate-protocol/stargate',
+  compound: 'compound-finance/compound-protocol',
+  makerdao: 'makerdao/dss',
+};
+
+const DEFILLAMA_SLUGS: Record<string, string> = {
+  aave: 'aave',
+  uniswap: 'uniswap',
+  lido: 'lido',
+  makerdao: 'maker',
+  compound: 'compound-finance',
+  stargate: 'stargate-finance',
+};
 
 /**
  * Orchestrates data collection from all sources for a service.
@@ -25,7 +47,6 @@ export async function collectServiceData(service: {
   const rawData: CollectorResult[] = [];
   const factorData: FactorData = {};
 
-  // Parallel collection from all sources
   const promises: Promise<CollectorResult | null>[] = [];
 
   // CoinGecko exchange data
@@ -50,6 +71,34 @@ export async function collectServiceData(service: {
     }
   }
 
+  // GitHub open source data
+  const githubRepo = GITHUB_REPOS[service.id];
+  if (githubRepo) {
+    promises.push(
+      collectGitHubData(githubRepo).catch((err) => {
+        logger.error({ serviceId: service.id, source: 'github', err }, 'GitHub collection failed');
+        return null;
+      })
+    );
+  }
+
+  // DeFiLlama TVL data for DeFi protocols
+  const defillamaSlug = DEFILLAMA_SLUGS[service.id];
+  if (defillamaSlug) {
+    promises.push(
+      collectDeFiLlamaData(defillamaSlug).catch((err) => {
+        logger.error({ serviceId: service.id, source: 'defillama', err }, 'DeFiLlama collection failed');
+        return null;
+      })
+    );
+  }
+
+  // Curated audit registry lookup
+  const auditData = getAuditRegistry(service.id);
+  if (auditData) {
+    rawData.push(auditData);
+  }
+
   const results = await Promise.allSettled(promises);
 
   for (const result of results) {
@@ -65,7 +114,6 @@ export async function collectServiceData(service: {
 }
 
 async function collectCoinGeckoData(serviceName: string): Promise<CollectorResult | null> {
-  // Try to find the exchange on CoinGecko
   const slug = serviceName.toLowerCase().replace(/\s+/g, '-');
   const exchange = await fetchExchangeData(slug);
 
@@ -105,6 +153,48 @@ async function collectOnChainData(address: string): Promise<CollectorResult | nu
   };
 }
 
+async function collectGitHubData(repo: string): Promise<CollectorResult | null> {
+  const ghData = await fetchGitHubRepo(repo);
+
+  if (!ghData) return null;
+
+  return {
+    source: 'github',
+    dataType: 'open_source',
+    data: {
+      repo,
+      stars: ghData.stars,
+      forks: ghData.forks,
+      openIssues: ghData.openIssues,
+      language: ghData.language,
+      license: ghData.license,
+      lastPush: ghData.lastPush,
+      contributorCount: ghData.contributorCount,
+      commitActivity90d: ghData.commitActivity90d,
+    },
+    confidence: 0.85,
+    collectedAt: new Date(),
+  };
+}
+
+async function collectDeFiLlamaData(protocolSlug: string): Promise<CollectorResult | null> {
+  const tvlData = await fetchProtocolTVL(protocolSlug);
+
+  if (!tvlData) return null;
+
+  return {
+    source: 'defillama',
+    dataType: 'defi_tvl',
+    data: {
+      protocol: protocolSlug,
+      tvl: tvlData.tvl,
+      chains: tvlData.chains,
+    },
+    confidence: 0.9,
+    collectedAt: new Date(),
+  };
+}
+
 function normalizeFactorData(rawData: CollectorResult[], factorData: FactorData): void {
   for (const result of rawData) {
     if (result.source === 'coingecko' && result.dataType === 'exchange_data') {
@@ -114,22 +204,73 @@ function normalizeFactorData(rawData: CollectorResult[], factorData: FactorData)
         volume24hBtc: number;
       };
 
-      // Track Record
       if (!factorData.trackRecord) {
         factorData.trackRecord = {
           yearsOperating: data.yearEstablished
             ? new Date().getFullYear() - data.yearEstablished
             : 0,
           majorIncidents: 0,
-          volumeHandled: (data.volume24hBtc || 0) * 60000, // rough BTC→USD
-          uptimePercent: 99.9,
+          volumeHandled: (data.volume24hBtc || 0) * 60000,
         };
       }
     }
 
-    if (result.source === 'etherscan' && result.dataType === 'on_chain') {
-      // On-chain data can inform multiple factors
-      // For now, just store raw data — factor calculators will use it later
+    if (result.source === 'github' && result.dataType === 'open_source') {
+      const data = result.data as {
+        commitActivity90d: number;
+        contributorCount: number;
+        license: string | null;
+      };
+
+      factorData.openSource = {
+        hasRepository: true,
+        commitActivity: data.commitActivity90d,
+        contributorCount: data.contributorCount,
+        testCoverage: undefined,
+        documentationQuality: undefined,
+        hasBugBounty: false,
+      };
+    }
+
+    if (result.source === 'audit_registry' && result.dataType === 'security_audit') {
+      const data = result.data as {
+        hasAudit: boolean;
+        auditCount: number;
+        auditorName: string;
+        auditorReputation: number;
+        lastAuditDate: string;
+        scopeCoverage: string;
+      };
+
+      factorData.securityAudits = {
+        hasAudit: data.hasAudit,
+        auditCount: data.auditCount,
+        auditorName: data.auditorName,
+        auditorReputation: data.auditorReputation,
+        lastAuditDate: data.lastAuditDate ? new Date(data.lastAuditDate) : undefined,
+        scopeCoverage: data.scopeCoverage as 'full' | 'partial' | 'unknown',
+      };
+    }
+
+    if (result.source === 'defillama' && result.dataType === 'defi_tvl') {
+      const data = result.data as {
+        tvl: number;
+        chains: string[];
+      };
+
+      // Use TVL to enhance track record data
+      if (factorData.trackRecord) {
+        factorData.trackRecord.volumeHandled = Math.max(
+          factorData.trackRecord.volumeHandled || 0,
+          data.tvl
+        );
+      } else {
+        factorData.trackRecord = {
+          yearsOperating: 0,
+          majorIncidents: 0,
+          volumeHandled: data.tvl,
+        };
+      }
     }
   }
 }

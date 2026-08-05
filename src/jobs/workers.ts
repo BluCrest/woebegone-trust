@@ -1,112 +1,102 @@
-import { Worker, type Job } from 'bullmq';
-import { getRedis } from '../config/redis.js';
 import { getLogger } from '../utils/logger.js';
-import { collectServiceData } from '../modules/data-collection/aggregator.js';
-import { calculateTrustScore } from '../modules/scoring/scoring.engine.js';
-import { getServiceById, updateServiceScore } from '../modules/services/service.service.js';
-import { getDb } from '../config/database.js';
-import { dataPoints } from '../db/schema/data-points.js';
-import { randomUUID } from 'crypto';
 
 export function startWorkers() {
-  const logger = getLogger();
-  const connection = getRedis();
+  try {
+    const { Worker } = require('bullmq');
+    const { getRedis } = require('../config/redis.js');
+    const { collectServiceData } = require('../modules/data-collection/aggregator.js');
+    const { calculateTrustScore } = require('../modules/scoring/scoring.engine.js');
+    const { getServiceById, updateServiceScore } = require('../modules/services/service.service.js');
+    const { getDb } = require('../config/database.js');
+    const { dataPoints } = require('../db/schema/data-points.js');
+    const { randomUUID } = require('crypto');
+    const connection = getRedis();
 
-  // Data refresh worker
-  const dataRefreshWorker = new Worker(
-    'data-refresh',
-    async (job: Job<{ serviceId: string }>) => {
-      const { serviceId } = job.data;
-      logger.info({ serviceId }, 'Processing data refresh job');
+    const dataRefreshWorker = new Worker(
+      'data-refresh',
+      async (job: any) => {
+        const { serviceId } = job.data;
+        const logger = getLogger();
+        logger.info({ serviceId }, 'Processing data refresh job');
 
-      const service = await getServiceById(serviceId);
-      if (!service) {
-        logger.warn({ serviceId }, 'Service not found, skipping');
-        return;
-      }
+        const service = await getServiceById(serviceId);
+        if (!service) return;
 
-      const { factorData, rawData } = await collectServiceData({
-        id: service.id,
-        name: service.name,
-        website: service.website || undefined,
-        addresses: (service.addresses as Record<string, string[]>) || {},
-      });
-
-      // Store raw data points
-      const db = getDb();
-      for (const point of rawData) {
-        await db.insert(dataPoints).values({
-          id: randomUUID(),
-          serviceId,
-          category: point.dataType,
-          source: point.source,
-          data: point.data,
-          confidence: point.confidence,
-          collectedAt: point.collectedAt,
+        const { factorData, rawData } = await collectServiceData({
+          id: service.id,
+          name: service.name,
+          website: service.website || undefined,
+          addresses: typeof service.addresses === 'string' ? JSON.parse(service.addresses) : service.addresses || {},
         });
-      }
 
-      // Trigger score recalculation
-      const score = await calculateTrustScore(serviceId, factorData);
-      await updateServiceScore(serviceId, {
-        overallScore: score.score,
-        grade: score.grade,
-        confidence: score.confidence,
-        factorBreakdown: Object.fromEntries(
-          Object.entries(score.factors).map(([k, v]) => [k, { score: v.score, confidence: v.confidence, weight: v.weight }])
-        ),
-        methodologyVersion: score.methodologyVersion,
-      });
+        const db = getDb();
+        for (const point of rawData) {
+          await db.insert(dataPoints).values({
+            id: randomUUID(),
+            serviceId,
+            category: point.dataType,
+            source: point.source,
+            data: JSON.stringify(point.data),
+            confidence: point.confidence,
+          });
+        }
 
-      logger.info({ serviceId, score: score.score, grade: score.grade }, 'Data refresh complete');
-      return { score: score.score, grade: score.grade };
-    },
-    { connection: connection.duplicate(), concurrency: 5 }
-  );
+        const score = await calculateTrustScore(serviceId, factorData);
+        await updateServiceScore(serviceId, {
+          overallScore: score.score,
+          grade: score.grade,
+          confidence: score.confidence,
+          factorBreakdown: Object.fromEntries(
+            Object.entries(score.factors).map(([k, v]: [string, any]) => [k, { score: v.score, confidence: v.confidence, weight: v.weight }])
+          ),
+          methodologyVersion: score.methodologyVersion,
+        });
 
-  // Score recalculation worker
-  const scoreRecalcWorker = new Worker(
-    'score-recalculation',
-    async (job: Job<{ serviceId: string }>) => {
-      const { serviceId } = job.data;
-      logger.info({ serviceId }, 'Processing score recalculation job');
+        return { score: score.score, grade: score.grade };
+      },
+      { connection: connection.duplicate(), concurrency: 5 }
+    );
 
-      // This reuses existing data points to recalculate scores
-      // Used when methodology changes
-      const service = await getServiceById(serviceId);
-      if (!service) return;
+    const scoreRecalcWorker = new Worker(
+      'score-recalculation',
+      async (job: any) => {
+        const { serviceId } = job.data;
+        const service = await getServiceById(serviceId);
+        if (!service) return;
 
-      const { factorData } = await collectServiceData({
-        id: service.id,
-        name: service.name,
-        website: service.website || undefined,
-        addresses: (service.addresses as Record<string, string[]>) || {},
-      });
+        const { factorData } = await collectServiceData({
+          id: service.id,
+          name: service.name,
+          website: service.website || undefined,
+          addresses: typeof service.addresses === 'string' ? JSON.parse(service.addresses) : service.addresses || {},
+        });
 
-      const score = await calculateTrustScore(serviceId, factorData);
-      await updateServiceScore(serviceId, {
-        overallScore: score.score,
-        grade: score.grade,
-        confidence: score.confidence,
-        factorBreakdown: Object.fromEntries(
-          Object.entries(score.factors).map(([k, v]) => [k, { score: v.score, confidence: v.confidence, weight: v.weight }])
-        ),
-        methodologyVersion: score.methodologyVersion,
-      });
+        const score = await calculateTrustScore(serviceId, factorData);
+        await updateServiceScore(serviceId, {
+          overallScore: score.score,
+          grade: score.grade,
+          confidence: score.confidence,
+          factorBreakdown: Object.fromEntries(
+            Object.entries(score.factors).map(([k, v]: [string, any]) => [k, { score: v.score, confidence: v.confidence, weight: v.weight }])
+          ),
+          methodologyVersion: score.methodologyVersion,
+        });
 
-      logger.info({ serviceId, score: score.score }, 'Score recalculation complete');
-      return { score: score.score };
-    },
-    { connection: connection.duplicate(), concurrency: 3 }
-  );
+        return { score: score.score };
+      },
+      { connection: connection.duplicate(), concurrency: 3 }
+    );
 
-  dataRefreshWorker.on('failed', (job, err) => {
-    logger.error({ jobId: job?.id, err }, 'Data refresh job failed');
-  });
+    dataRefreshWorker.on('failed', (job: any, err: any) => {
+      getLogger().error({ jobId: job?.id, err }, 'Data refresh job failed');
+    });
 
-  scoreRecalcWorker.on('failed', (job, err) => {
-    logger.error({ jobId: job?.id, err }, 'Score recalculation job failed');
-  });
+    scoreRecalcWorker.on('failed', (job: any, err: any) => {
+      getLogger().error({ jobId: job?.id, err }, 'Score recalculation job failed');
+    });
 
-  logger.info('BullMQ workers started');
+    getLogger().info('BullMQ workers started');
+  } catch {
+    getLogger().warn('Redis unavailable, BullMQ workers not started');
+  }
 }

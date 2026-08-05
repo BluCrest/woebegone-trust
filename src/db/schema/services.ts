@@ -1,4 +1,4 @@
-import { pgTable, text, timestamp, integer, boolean, jsonb, index } from 'drizzle-orm/pg-core';
+import { sqliteTable, text, integer } from 'drizzle-orm/sqlite-core';
 
 export const serviceCategories = [
   'exchange',
@@ -17,45 +17,29 @@ export const serviceCategories = [
 
 export type ServiceCategory = (typeof serviceCategories)[number];
 
-export const services = pgTable(
-  'services',
-  {
-    id: text('id').primaryKey(),
-    name: text('name').notNull(),
-    slug: text('slug').notNull().unique(),
-    category: text('category', { enum: serviceCategories }).notNull(),
-    website: text('website'),
-    description: text('description'),
-    logoUrl: text('logo_url'),
+export const services = sqliteTable('services', {
+  id: text('id').primaryKey(),
+  name: text('name').notNull(),
+  slug: text('slug').notNull().unique(),
+  category: text('category').notNull(),
+  website: text('website'),
+  description: text('description'),
+  logoUrl: text('logo_url'),
 
-    // Core identity
-    foundedYear: integer('founded_year'),
-    headquarters: text('headquarters'),
-    legalEntity: text('legal_entity'),
+  foundedYear: integer('founded_year'),
+  headquarters: text('headquarters'),
+  legalEntity: text('legal_entity'),
 
-    // Ownership info
-    submitterEmail: text('submitter_email'),
-    submitterRelation: text('submitter_relation'), // 'owner', 'community', 'unknown'
+  submitterEmail: text('submitter_email'),
+  submitterRelation: text('submitter_relation'),
 
-    // On-chain addresses (for data collection)
-    addresses: jsonb('addresses').$type<Record<string, string[]>>().default({}),
-    // e.g. { ethereum: ["0x..."], solana: ["..."] }
+  addresses: text('addresses').default('{}'),
+  tags: text('tags').default('[]'),
+  metadata: text('metadata').default('{}'),
 
-    // Metadata
-    tags: text('tags').array().default([]),
-    metadata: jsonb('metadata').$type<Record<string, unknown>>().default({}),
+  isActive: integer('is_active', { mode: 'boolean' }).default(true),
+  isUnderReview: integer('is_under_review', { mode: 'boolean' }).default(false),
 
-    // Status
-    isActive: boolean('is_active').default(true),
-    isUnderReview: boolean('is_under_review').default(false),
-
-    // Timestamps
-    createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
-    updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
-  },
-  (t) => [
-    index('services_category_idx').on(t.category),
-    index('services_slug_idx').on(t.slug),
-    index('services_is_active_idx').on(t.isActive),
-  ]
-);
+  createdAt: integer('created_at', { mode: 'timestamp' }).$defaultFn(() => new Date()).notNull(),
+  updatedAt: integer('updated_at', { mode: 'timestamp' }).$defaultFn(() => new Date()).notNull(),
+});

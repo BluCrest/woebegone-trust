@@ -5,8 +5,8 @@ import { resolve } from 'path';
 loadDotenv({ path: resolve(process.cwd(), '.env') });
 
 const envSchema = z.object({
-  DATABASE_URL: z.string().url().or(z.string().startsWith('postgresql://')),
-  REDIS_URL: z.string().default('redis://localhost:6379'),
+  DATABASE_URL: z.string().default('./data/woebegone.db'),
+  REDIS_URL: z.string().optional(),
   PORT: z.coerce.number().default(3000),
   NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
 
