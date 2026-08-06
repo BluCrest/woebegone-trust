@@ -16,6 +16,12 @@ const envSchema = z.object({
   INFURA_URL: z.string().optional(),
   PRIVATE_KEY: z.string().optional(),
   IPFS_API_KEY: z.string().optional(),
+
+  // Web search — used by the auditor to discover security info
+  EXA_API_KEY: z.string().optional(),
+  BRAVE_SEARCH_API_KEY: z.string().optional(),
+  GOOGLE_SEARCH_API_KEY: z.string().optional(),
+  GOOGLE_SEARCH_CX: z.string().optional(),
 });
 
 export type Env = z.infer<typeof envSchema>;

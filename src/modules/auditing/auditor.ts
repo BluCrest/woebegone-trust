@@ -9,7 +9,7 @@ import { probeHttp, evaluateHttpQuestions } from './probes/http.js';
 import { probeDns, evaluateDnsQuestions } from './probes/dns.js';
 import { probeApi, evaluateApiQuestions } from './probes/api.js';
 import { probeGithub, evaluateGithubQuestions, getGithubRepo } from './probes/github.js';
-import { probeBusiness, evaluateBusinessQuestions } from './probes/business.js';
+import { probeWebSearch, evaluateWebSearchQuestions } from './probes/web-search.js';
 import { probeOnChain, evaluateOnChainQuestions } from './probes/on-chain.js';
 import { getLogger } from '../../utils/logger.js';
 
@@ -113,19 +113,26 @@ export async function auditService(service: {
     }
   }
 
-  // ── Business Probe ──────────────────────────────────────────
+  // ── Web Search Probe (discovers business/compliance info) ────
   if (neededProbeTypes.has('business')) {
     try {
-      const businessResult = await probeBusiness(service.id);
-      const businessQuestions = evaluateBusinessQuestions(businessResult)
+      const webSearchResult = await probeWebSearch(service.id, service.name, service.website);
+      const webSearchQuestions = evaluateWebSearchQuestions(webSearchResult)
         .filter(q => applicableIds.has(q.questionId));
-      allQuestions.push(...businessQuestions);
+      allQuestions.push(...webSearchQuestions);
       logger.info(
-        { serviceId: service.id, legalEntity: businessResult.hasLegalEntity, audits: businessResult.auditCount },
-        'Business probe complete'
+        {
+          serviceId: service.id,
+          legalEntity: webSearchResult.hasLegalEntity,
+          audits: webSearchResult.auditCount,
+          proofOfReserves: webSearchResult.hasProofOfReserves,
+          bugBounty: webSearchResult.hasBugBounty,
+          searchResults: webSearchResult.rawResults.length,
+        },
+        'Web search probe complete'
       );
     } catch (err) {
-      logger.warn({ serviceId: service.id, err }, 'Business probe failed');
+      logger.warn({ serviceId: service.id, err }, 'Web search probe failed');
     }
   }
 
