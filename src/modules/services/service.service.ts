@@ -94,7 +94,25 @@ export async function getServiceById(id: string) {
     .where(eq(serviceScores.serviceId, id))
     .limit(1);
 
-  return { ...service, score: score || null };
+  // Fetch latest factor breakdown from score history
+  const [latestHistory] = await db
+    .select()
+    .from(scoreHistory)
+    .where(eq(scoreHistory.serviceId, id))
+    .orderBy(desc(scoreHistory.calculatedAt))
+    .limit(1);
+
+  const factors = latestHistory?.factorBreakdown
+    ? JSON.parse(latestHistory.factorBreakdown as string)
+    : undefined;
+
+  return {
+    ...service,
+    score: score ? {
+      ...score,
+      factors,
+    } : null,
+  };
 }
 
 export async function getServiceBySlug(slug: string) {

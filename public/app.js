@@ -56,22 +56,31 @@ function categoryIcon(cat) {
 
 function factorName(id) {
   const names = {
-    securityAudits: 'Security Audits',
-    proofOfReserves: 'Proof of Reserves',
     trackRecord: 'Track Record',
-    teamTransparency: 'Team Transparency',
-    insurance: 'Insurance',
-    regulatoryCompliance: 'Regulatory',
-    openSource: 'Open Source',
-    incidentHistory: 'Incident History',
+    security: 'Security',
+    transparency: 'Transparency',
+    protection: 'Protection',
   };
   return names[id] || id;
 }
 
 function factorWeight(id) {
-  const weights = { securityAudits: 20, proofOfReserves: 15, trackRecord: 15, teamTransparency: 12, insurance: 10, regulatoryCompliance: 10, openSource: 8, incidentHistory: 10 };
+  const weights = { trackRecord: 30, security: 30, transparency: 20, protection: 20 };
   return weights[id] || 0;
 }
+
+function factorDescription(id) {
+  const desc = {
+    trackRecord: 'Years operating, incident history, trading volume, uptime',
+    security: 'Audits, bug bounty, open source, code quality',
+    transparency: 'Proof of reserves, team identity, regulatory licenses',
+    protection: 'Insurance coverage, incident response, fund safety',
+  };
+  return desc[id] || '';
+}
+
+let searchTimeout = null;
+let searchResults = null;
 
 // ── Score Ring SVG ──────────────────────────────────────────────
 function scoreRing(score, grade, size = 120) {
@@ -104,89 +113,36 @@ function skeleton(count = 6) {
     </div>`).join('');
 }
 
-// ── Home Page ───────────────────────────────────────────────────
-async function renderHome() {
-  const app = document.getElementById('app');
-  app.innerHTML = `
-    <div class="min-h-screen">
-      ${renderNav()}
-      <main class="max-w-6xl mx-auto px-4 sm:px-6 pt-24 pb-16">
-        <section class="text-center mb-12 fade-in">
-          <h1 class="text-4xl sm:text-5xl font-bold mb-4 tracking-tight">
-            Trust <span class="text-accent">Registry</span>
-          </h1>
-          <p class="text-muted text-lg max-w-2xl mx-auto">
-            Open-source crypto trust scoring. No black boxes. No accounts to read. A public good.
-          </p>
-          <div class="flex justify-center gap-4 mt-6 text-sm text-muted">
-            <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-green-500"></span> Live Scoring</span>
-            <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-blue-500"></span> 8 Trust Factors</span>
-            <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-purple-500"></span> Open Source</span>
-          </div>
-        </section>
-
-        <section class="mb-8 fade-in">
-          <div class="flex flex-wrap gap-2 justify-center" id="categories"></div>
-        </section>
-
-        <section id="leaderboard" class="fade-in">
-          <div class="flex items-center justify-between mb-6">
-            <h2 class="text-xl font-semibold" id="leaderboard-title">All Services</h2>
-            <span class="text-sm text-muted" id="service-count"></span>
-          </div>
-          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4" id="services-grid">
-            ${skeleton()}
-          </div>
-        </section>
-
-        <section class="mt-16 text-center fade-in">
-          <div class="bg-surface rounded-xl border border-border p-8 max-w-2xl mx-auto">
-            <h3 class="text-lg font-semibold mb-2">How It Works</h3>
-            <p class="text-muted text-sm mb-6">Each service is scored on 8 trust dimensions using weighted aggregation with confidence adjustment. Missing data is excluded — not penalized.</p>
-            <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 text-sm">
-              <div class="text-center"><div class="text-2xl font-bold text-accent">8</div><div class="text-muted">Trust Factors</div></div>
-              <div class="text-center"><div class="text-2xl font-bold text-gold">0-100</div><div class="text-muted">Score Range</div></div>
-              <div class="text-center"><div class="text-2xl font-bold text-platinum">4</div><div class="text-muted">Trust Tiers</div></div>
-              <div class="text-center"><div class="text-2xl font-bold text-green-500">Free</div><div class="text-muted">No Accounts</div></div>
-            </div>
-          </div>
-        </section>
-      </main>
-      ${renderFooter()}
-    </div>`;
-
-  // Load categories
-  const catData = await api('/categories');
-  if (catData?.data) {
-    const catContainer = document.getElementById('categories');
-    catContainer.innerHTML = `
-      <button onclick="filterCategory(null)" class="px-3 py-1.5 rounded-full text-sm border transition-all ${!currentCategory ? 'bg-white text-black border-white' : 'bg-surface border-border text-muted hover:border-white/30'}">All</button>
-      ${catData.data.map(c => `
-        <button onclick="filterCategory('${c.id}')" class="px-3 py-1.5 rounded-full text-sm border transition-all ${currentCategory === c.id ? 'bg-white text-black border-white' : 'bg-surface border-border text-muted hover:border-white/30'}">${c.name}</button>
-      `).join('')}`;
-  }
-
-  // Load services
-  loadServices();
-}
-
-async function loadServices() {
-  const params = currentCategory ? `?category=${currentCategory}&limit=50` : '?limit=50';
-  const data = await api('/services' + params);
+// ── Search ─────────────────────────────────────────────────────
+async function handleSearch(query) {
   const grid = document.getElementById('services-grid');
   const count = document.getElementById('service-count');
   const title = document.getElementById('leaderboard-title');
 
-  if (!data?.data?.length) {
-    grid.innerHTML = '<div class="col-span-full text-center text-muted py-12">No services found.</div>';
+  if (!query || query.length < 2) {
+    searchResults = null;
+    title.textContent = currentCategory ? `${currentCategory.charAt(0).toUpperCase() + currentCategory.slice(1).replace('_', ' ')}s` : 'All Services';
+    loadServices();
     return;
   }
 
-  title.textContent = currentCategory ? `${currentCategory.charAt(0).toUpperCase() + currentCategory.slice(1).replace('_', ' ')}s` : 'All Services';
-  count.textContent = `${data.data.length} services`;
-  servicesCache = data.data;
+  title.textContent = `Search: "${query}"`;
+  grid.innerHTML = skeleton(3);
 
-  grid.innerHTML = data.data.map((s, i) => `
+  const data = await api(`/services/search?q=${encodeURIComponent(query)}`);
+  if (!data?.data?.length) {
+    grid.innerHTML = '<div class="col-span-full text-center text-muted py-12">No services found.</div>';
+    count.textContent = '0 results';
+    return;
+  }
+
+  searchResults = data.data;
+  count.textContent = `${data.data.length} results`;
+  renderServiceCards(data.data, grid);
+}
+
+function renderServiceCards(services, container) {
+  container.innerHTML = services.map((s, i) => `
     <div onclick="navigate('service', {id: '${s.id}'})" class="bg-surface rounded-xl border border-border p-5 cursor-pointer hover:border-white/20 transition-all group fade-in" style="animation-delay: ${i * 50}ms">
       <div class="flex items-start justify-between mb-4">
         <div class="flex items-center gap-3">
@@ -213,8 +169,114 @@ async function loadServices() {
     </div>`).join('');
 }
 
+// ── Home Page ───────────────────────────────────────────────────
+async function renderHome() {
+  const app = document.getElementById('app');
+  app.innerHTML = `
+    <div class="min-h-screen">
+      ${renderNav()}
+      <main class="max-w-6xl mx-auto px-4 sm:px-6 pt-24 pb-16">
+        <section class="text-center mb-8 fade-in">
+          <h1 class="text-4xl sm:text-5xl font-bold mb-4 tracking-tight">
+            Trust <span class="text-accent">Registry</span>
+          </h1>
+          <p class="text-muted text-lg max-w-2xl mx-auto mb-6">
+            Open-source crypto trust scoring. No black boxes. No accounts to read. A public good.
+          </p>
+
+          <div class="max-w-xl mx-auto mb-6">
+            <div class="relative">
+              <input
+                type="text"
+                id="search-input"
+                placeholder="Search services... (e.g. Binance, Uniswap, MetaMask)"
+                class="w-full bg-surface border border-border rounded-xl px-5 py-3 pl-12 text-sm text-white placeholder-muted focus:outline-none focus:border-accent/50 focus:ring-1 focus:ring-accent/30 transition-all"
+                oninput="handleSearch(this.value)"
+              />
+              <svg class="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/>
+              </svg>
+            </div>
+          </div>
+
+          <div class="flex justify-center gap-4 text-sm text-muted">
+            <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-green-500"></span> Live Scoring</span>
+            <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-blue-500"></span> 4 Trust Factors</span>
+            <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-purple-500"></span> Open Source</span>
+          </div>
+        </section>
+
+        <section class="mb-8 fade-in">
+          <div class="flex flex-wrap gap-2 justify-center" id="categories"></div>
+        </section>
+
+        <section id="leaderboard" class="fade-in">
+          <div class="flex items-center justify-between mb-6">
+            <h2 class="text-xl font-semibold" id="leaderboard-title">All Services</h2>
+            <span class="text-sm text-muted" id="service-count"></span>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4" id="services-grid">
+            ${skeleton()}
+          </div>
+        </section>
+
+        <section class="mt-16 text-center fade-in">
+          <div class="bg-surface rounded-xl border border-border p-8 max-w-2xl mx-auto">
+            <h3 class="text-lg font-semibold mb-2">How It Works</h3>
+            <p class="text-muted text-sm mb-6">Each service is scored on 4 trust dimensions. Scores are additive (0-100 each), weighted, and averaged. Curated data provides baselines; live APIs enhance over time.</p>
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 text-sm">
+              <div class="text-center"><div class="text-2xl font-bold text-accent">4</div><div class="text-muted">Trust Factors</div></div>
+              <div class="text-center"><div class="text-2xl font-bold text-gold">0-100</div><div class="text-muted">Score Range</div></div>
+              <div class="text-center"><div class="text-2xl font-bold text-platinum">4</div><div class="text-muted">Trust Tiers</div></div>
+              <div class="text-center"><div class="text-2xl font-bold text-green-500">Free</div><div class="text-muted">No Accounts</div></div>
+            </div>
+          </div>
+        </section>
+      </main>
+      ${renderFooter()}
+    </div>`;
+
+  // Load categories
+  const catData = await api('/categories');
+  if (catData?.data) {
+    const catContainer = document.getElementById('categories');
+    catContainer.innerHTML = `
+      <button onclick="filterCategory(null)" class="px-3 py-1.5 rounded-full text-sm border transition-all ${!currentCategory ? 'bg-white text-black border-white' : 'bg-surface border-border text-muted hover:border-white/30'}">All</button>
+      ${catData.data.map(c => `
+        <button onclick="filterCategory('${c.id}')" class="px-3 py-1.5 rounded-full text-sm border transition-all ${currentCategory === c.id ? 'bg-white text-black border-white' : 'bg-surface border-border text-muted hover:border-white/30'}">${c.name}</button>
+      `).join('')}`;
+  }
+
+  // Load services
+  loadServices();
+}
+
+async function loadServices() {
+  if (searchResults) return; // don't override search results
+
+  const params = currentCategory ? `?category=${currentCategory}&limit=50` : '?limit=50';
+  const data = await api('/services' + params);
+  const grid = document.getElementById('services-grid');
+  const count = document.getElementById('service-count');
+  const title = document.getElementById('leaderboard-title');
+
+  if (!data?.data?.length) {
+    grid.innerHTML = '<div class="col-span-full text-center text-muted py-12">No services found.</div>';
+    return;
+  }
+
+  title.textContent = currentCategory ? `${currentCategory.charAt(0).toUpperCase() + currentCategory.slice(1).replace('_', ' ')}s` : 'All Services';
+  count.textContent = `${data.data.length} services`;
+  servicesCache = data.data;
+
+  renderServiceCards(data.data, grid);
+}
+
 window.filterCategory = function(cat) {
   currentCategory = cat;
+  searchResults = null;
+  const searchInput = document.getElementById('search-input');
+  if (searchInput) searchInput.value = '';
   renderHome();
 };
 
@@ -321,7 +383,7 @@ async function renderService(id) {
         <div class="w-full bg-border rounded-full h-2">
           <div class="h-2 rounded-full factor-bar ${f.hasData ? gradeColor(score.grade).replace('text-', 'bg-') : 'bg-muted/30'}" style="width: ${f.hasData ? f.score : 0}%"></div>
         </div>
-        ${f.missingFields?.length ? `<div class="text-xs text-muted mt-1">Missing: ${f.missingFields.join(', ')}</div>` : ''}
+        <div class="text-xs text-muted mt-1">${factorDescription(id)}</div>
       </div>`).join('');
 
     // Factor details cards
@@ -339,6 +401,7 @@ async function renderService(id) {
             <div><span class="text-muted">Weight:</span> <span class="font-semibold">${Math.round(f.weight * 100)}%</span></div>
             <div><span class="text-muted">Status:</span> <span class="font-semibold">${f.hasData ? 'Active' : 'Missing'}</span></div>
           </div>
+          ${f.missingFields?.length ? `<div class="text-xs text-muted mt-2">Missing: ${f.missingFields.join(', ')}</div>` : ''}
         </div>`).join('');
     }
   }
@@ -389,4 +452,5 @@ function render() {
 
 // ── Init ────────────────────────────────────────────────────────
 window.navigate = navigate;
+window.handleSearch = handleSearch;
 render();

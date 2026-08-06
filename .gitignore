@@ -1,7 +1,8 @@
 node_modules/
 dist/
 .env
-data/
+data/*.db*
+data/*.sqlite*
 *.log
 coverage/
 .turbo/

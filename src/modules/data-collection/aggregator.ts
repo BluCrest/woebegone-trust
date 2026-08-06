@@ -5,6 +5,8 @@ import { fetchGitHubRepo } from './collectors/api/github.js';
 import { fetchProtocolTVL } from './collectors/api/defillama.js';
 import { getAuditRegistry } from './collectors/curated/audit-registry.js';
 import { getLogger } from '../../utils/logger.js';
+import { readFileSync } from 'fs';
+import { join } from 'path';
 
 export interface CollectorResult {
   source: string;
@@ -22,6 +24,12 @@ const GITHUB_REPOS: Record<string, string> = {
   stargate: 'stargate-protocol/stargate',
   compound: 'compound-finance/compound-protocol',
   makerdao: 'makerdao/dss',
+  curve: 'curvefi/curve-js',
+  sushiswap: 'sushiswap/sushiswap-core',
+  'trust-wallet': 'trustwallet/trust-wallet-core',
+  phantom: 'phantom-app/phantom-js',
+  trezor: 'trezor/trezor-firmware',
+  bitgo: 'BitGo/bitgo-sdk',
 };
 
 const DEFILLAMA_SLUGS: Record<string, string> = {
@@ -31,11 +39,36 @@ const DEFILLAMA_SLUGS: Record<string, string> = {
   makerdao: 'maker',
   compound: 'compound-finance',
   stargate: 'stargate-finance',
+  curve: 'curve-dex',
+  sushiswap: 'sushiswap',
 };
 
+// ── Curated Data Cache ────────────────────────────────────────
+let curatedCache: Record<string, Record<string, unknown>> | null = null;
+
+function loadCuratedData(): Record<string, Record<string, unknown>> {
+  if (curatedCache) return curatedCache;
+
+  try {
+    const curatedPath = join(process.cwd(), 'data', 'curated.json');
+    const raw = readFileSync(curatedPath, 'utf-8');
+    const parsed = JSON.parse(raw);
+    // Strip _meta key
+    const { _meta, ...services } = parsed;
+    curatedCache = services;
+    getLogger().info({ count: Object.keys(services).length }, 'Loaded curated trust data');
+    return curatedCache!;
+  } catch (err) {
+    getLogger().warn({ err }, 'Failed to load curated data, using live data only');
+    curatedCache = {};
+    return curatedCache;
+  }
+}
+
 /**
- * Orchestrates data collection from all sources for a service.
- * Returns normalized FactorData ready for the scoring engine.
+ * Orchestrates data collection for a service.
+ * Priority: curated.json baseline → live API enhancement.
+ * Returns FactorData ready for the scoring engine.
  */
 export async function collectServiceData(service: {
   id: string;
@@ -47,76 +80,106 @@ export async function collectServiceData(service: {
   const rawData: CollectorResult[] = [];
   const factorData: FactorData = {};
 
+  // ── Step 1: Load curated baseline ────────────────────────────
+  const curated = loadCuratedData();
+  const curatedData = curated[service.id];
+
+  if (curatedData) {
+    logger.info({ serviceId: service.id }, 'Using curated baseline data');
+    applyCuratedData(curatedData, factorData);
+    rawData.push({
+      source: 'curated',
+      dataType: 'baseline',
+      data: curatedData,
+      confidence: 0.95,
+      collectedAt: new Date(),
+    });
+  }
+
+  // ── Step 2: Enhance with live APIs ───────────────────────────
   const promises: Promise<CollectorResult | null>[] = [];
 
-  // CoinGecko exchange data
-  if (service.name) {
+  // CoinGecko (for exchanges — enhances trackRecord)
+  if (!factorData.trackRecord?.volumeHandled) {
     promises.push(
-      collectCoinGeckoData(service.name).catch((err) => {
-        logger.error({ serviceId: service.id, source: 'coingecko', err }, 'Collection failed');
-        return null;
-      })
+      collectCoinGeckoData(service.name).catch(() => null)
     );
   }
 
   // On-chain data for Ethereum addresses
   if (service.addresses?.ethereum) {
-    for (const address of service.addresses.ethereum.slice(0, 3)) {
-      promises.push(
-        collectOnChainData(address).catch((err) => {
-          logger.error({ serviceId: service.id, address, err }, 'On-chain collection failed');
-          return null;
-        })
-      );
+    for (const address of service.addresses.ethereum.slice(0, 2)) {
+      promises.push(collectOnChainData(address).catch(() => null));
     }
   }
 
-  // GitHub open source data
+  // GitHub (enhances openSource)
   const githubRepo = GITHUB_REPOS[service.id];
-  if (githubRepo) {
-    promises.push(
-      collectGitHubData(githubRepo).catch((err) => {
-        logger.error({ serviceId: service.id, source: 'github', err }, 'GitHub collection failed');
-        return null;
-      })
-    );
+  if (githubRepo && !factorData.openSource?.hasRepository) {
+    promises.push(collectGitHubData(githubRepo).catch(() => null));
   }
 
-  // DeFiLlama TVL data for DeFi protocols
+  // DeFiLlama TVL (enhances trackRecord for DeFi)
   const defillamaSlug = DEFILLAMA_SLUGS[service.id];
   if (defillamaSlug) {
-    promises.push(
-      collectDeFiLlamaData(defillamaSlug).catch((err) => {
-        logger.error({ serviceId: service.id, source: 'defillama', err }, 'DeFiLlama collection failed');
-        return null;
-      })
-    );
+    promises.push(collectDeFiLlamaData(defillamaSlug).catch(() => null));
   }
 
-  // Curated audit registry lookup
+  // Audit registry (enhances securityAudits)
   const auditData = getAuditRegistry(service.id);
-  if (auditData) {
+  if (auditData && !factorData.securityAudits?.hasAudit) {
     rawData.push(auditData);
   }
 
+  // Run all live collectors in parallel
   const results = await Promise.allSettled(promises);
-
   for (const result of results) {
     if (result.status === 'fulfilled' && result.value) {
       rawData.push(result.value);
     }
   }
 
-  // Normalize collected data into FactorData
-  normalizeFactorData(rawData, factorData);
+  // ── Step 3: Merge live data into factorData ──────────────────
+  for (const result of rawData) {
+    if (result.source === 'curated') continue; // already applied
+    mergeLiveData(result, factorData);
+  }
 
   return { factorData, rawData };
 }
 
+// ── Curated Data Application ──────────────────────────────────
+function applyCuratedData(curated: Record<string, unknown>, factorData: FactorData): void {
+  if (curated.trackRecord) {
+    factorData.trackRecord = curated.trackRecord as FactorData['trackRecord'];
+  }
+  if (curated.securityAudits) {
+    factorData.securityAudits = curated.securityAudits as FactorData['securityAudits'];
+  }
+  if (curated.proofOfReserves) {
+    factorData.proofOfReserves = curated.proofOfReserves as FactorData['proofOfReserves'];
+  }
+  if (curated.teamTransparency) {
+    factorData.teamTransparency = curated.teamTransparency as FactorData['teamTransparency'];
+  }
+  if (curated.insurance) {
+    factorData.insurance = curated.insurance as FactorData['insurance'];
+  }
+  if (curated.regulatory) {
+    factorData.regulatory = curated.regulatory as FactorData['regulatory'];
+  }
+  if (curated.openSource) {
+    factorData.openSource = curated.openSource as FactorData['openSource'];
+  }
+  if (curated.incidentHistory) {
+    factorData.incidentHistory = curated.incidentHistory as FactorData['incidentHistory'];
+  }
+}
+
+// ── Live Data Collectors ──────────────────────────────────────
 async function collectCoinGeckoData(serviceName: string): Promise<CollectorResult | null> {
   const slug = serviceName.toLowerCase().replace(/\s+/g, '-');
   const exchange = await fetchExchangeData(slug);
-
   if (!exchange) return null;
 
   return {
@@ -155,7 +218,6 @@ async function collectOnChainData(address: string): Promise<CollectorResult | nu
 
 async function collectGitHubData(repo: string): Promise<CollectorResult | null> {
   const ghData = await fetchGitHubRepo(repo);
-
   if (!ghData) return null;
 
   return {
@@ -179,7 +241,6 @@ async function collectGitHubData(repo: string): Promise<CollectorResult | null> 
 
 async function collectDeFiLlamaData(protocolSlug: string): Promise<CollectorResult | null> {
   const tvlData = await fetchProtocolTVL(protocolSlug);
-
   if (!tvlData) return null;
 
   return {
@@ -195,53 +256,86 @@ async function collectDeFiLlamaData(protocolSlug: string): Promise<CollectorResu
   };
 }
 
-function normalizeFactorData(rawData: CollectorResult[], factorData: FactorData): void {
-  for (const result of rawData) {
-    if (result.source === 'coingecko' && result.dataType === 'exchange_data') {
-      const data = result.data as {
-        yearEstablished: number;
-        trustScoreRank: number;
-        volume24hBtc: number;
-      };
+// ── Live Data Merge ───────────────────────────────────────────
+function mergeLiveData(result: CollectorResult, factorData: FactorData): void {
+  // CoinGecko: enhance trackRecord if we don't have curated data
+  if (result.source === 'coingecko' && result.dataType === 'exchange_data') {
+    const data = result.data as {
+      yearEstablished: number;
+      volume24hBtc: number;
+    };
 
-      if (!factorData.trackRecord) {
-        factorData.trackRecord = {
-          yearsOperating: data.yearEstablished
-            ? new Date().getFullYear() - data.yearEstablished
-            : 0,
-          majorIncidents: 0,
-          volumeHandled: (data.volume24hBtc || 0) * 60000,
-        };
+    if (!factorData.trackRecord) {
+      factorData.trackRecord = {
+        yearsOperating: data.yearEstablished
+          ? new Date().getFullYear() - data.yearEstablished
+          : 0,
+        majorIncidents: 0,
+        volumeHandled: (data.volume24hBtc || 0) * 60000,
+      };
+    } else {
+      // Enhance existing curated data with live volume
+      if (data.volume24hBtc) {
+        const liveVolume = data.volume24hBtc * 60000;
+        if (liveVolume > (factorData.trackRecord.volumeHandled || 0)) {
+          factorData.trackRecord.volumeHandled = liveVolume;
+        }
       }
     }
+  }
 
-    if (result.source === 'github' && result.dataType === 'open_source') {
-      const data = result.data as {
-        commitActivity90d: number;
-        contributorCount: number;
-        license: string | null;
-      };
+  // GitHub: enhance openSource
+  if (result.source === 'github' && result.dataType === 'open_source') {
+    const data = result.data as {
+      commitActivity90d: number;
+      contributorCount: number;
+      license: string | null;
+    };
 
+    if (!factorData.openSource) {
       factorData.openSource = {
         hasRepository: true,
         commitActivity: data.commitActivity90d,
         contributorCount: data.contributorCount,
-        testCoverage: undefined,
-        documentationQuality: undefined,
         hasBugBounty: false,
       };
+    } else {
+      // Enhance with live data
+      factorData.openSource.commitActivity = data.commitActivity90d;
+      factorData.openSource.contributorCount = data.contributorCount;
     }
+  }
 
-    if (result.source === 'audit_registry' && result.dataType === 'security_audit') {
-      const data = result.data as {
-        hasAudit: boolean;
-        auditCount: number;
-        auditorName: string;
-        auditorReputation: number;
-        lastAuditDate: string;
-        scopeCoverage: string;
+  // DeFiLlama: enhance trackRecord with TVL
+  if (result.source === 'defillama' && result.dataType === 'defi_tvl') {
+    const data = result.data as { tvl: number };
+
+    if (!factorData.trackRecord) {
+      factorData.trackRecord = {
+        yearsOperating: 0,
+        majorIncidents: 0,
+        volumeHandled: data.tvl,
       };
+    } else {
+      factorData.trackRecord.volumeHandled = Math.max(
+        factorData.trackRecord.volumeHandled || 0,
+        data.tvl
+      );
+    }
+  }
 
+  // Audit registry: enhance securityAudits
+  if (result.source === 'audit_registry' && result.dataType === 'security_audit') {
+    const data = result.data as {
+      hasAudit: boolean;
+      auditCount: number;
+      auditorName: string;
+      auditorReputation: number;
+      lastAuditDate: string;
+      scopeCoverage: string;
+    };
+
+    if (!factorData.securityAudits) {
       factorData.securityAudits = {
         hasAudit: data.hasAudit,
         auditCount: data.auditCount,
@@ -250,27 +344,6 @@ function normalizeFactorData(rawData: CollectorResult[], factorData: FactorData)
         lastAuditDate: data.lastAuditDate ? new Date(data.lastAuditDate) : undefined,
         scopeCoverage: data.scopeCoverage as 'full' | 'partial' | 'unknown',
       };
-    }
-
-    if (result.source === 'defillama' && result.dataType === 'defi_tvl') {
-      const data = result.data as {
-        tvl: number;
-        chains: string[];
-      };
-
-      // Use TVL to enhance track record data
-      if (factorData.trackRecord) {
-        factorData.trackRecord.volumeHandled = Math.max(
-          factorData.trackRecord.volumeHandled || 0,
-          data.tvl
-        );
-      } else {
-        factorData.trackRecord = {
-          yearsOperating: 0,
-          majorIncidents: 0,
-          volumeHandled: data.tvl,
-        };
-      }
     }
   }
 }

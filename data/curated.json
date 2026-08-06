@@ -1,0 +1,277 @@
+{
+  "_meta": {
+    "version": "1.0.0",
+    "lastUpdated": "2026-08-05",
+    "description": "Curated trust data for known crypto services. Updated monthly. Live API data enhances these baselines."
+  },
+  "binance": {
+    "trackRecord": { "yearsOperating": 8, "majorIncidents": 1, "volumeHandled": 4e12, "uptimePercent": 99.9, "communitySentiment": 75 },
+    "securityAudits": { "hasAudit": true, "auditCount": 5, "auditorName": "CertiK", "auditorReputation": 85, "scopeCoverage": "full" },
+    "proofOfReserves": { "hasProof": true, "verificationMethod": "on_chain", "coverageRatio": 1.02, "liabilitiesScope": "all" },
+    "teamTransparency": { "namedMembers": 3, "verifiableProfiles": 2, "publicCommunications": 10, "hasLegalEntity": true, "teamTrackRecord": 80 },
+    "insurance": { "hasInsurance": true, "coverageAmount": 1e9, "aum": 8e10, "insurerReputation": 70, "isPubliclyVerifiable": true },
+    "regulatory": { "licenseCount": 15, "hasKycAml": true, "regulatoryViolations": 1, "jurisdictionQuality": 85, "hasLegalTransparency": true },
+    "openSource": { "hasRepository": false, "hasBugBounty": true },
+    "incidentHistory": { "totalIncidents": 1, "severityDistribution": { "critical": 0, "high": 1, "medium": 2, "low": 5 }, "avgResponseQuality": 80, "avgRecoveryDays": 7 }
+  },
+  "coinbase": {
+    "trackRecord": { "yearsOperating": 12, "majorIncidents": 0, "volumeHandled": 2e12, "uptimePercent": 99.95, "communitySentiment": 80 },
+    "securityAudits": { "hasAudit": true, "auditCount": 3, "auditorName": "Deloitte", "auditorReputation": 95, "scopeCoverage": "full" },
+    "proofOfReserves": { "hasProof": true, "verificationMethod": "attestation", "coverageRatio": 1.005, "liabilitiesScope": "all" },
+    "teamTransparency": { "namedMembers": 5, "verifiableProfiles": 5, "publicCommunications": 20, "hasLegalEntity": true, "teamTrackRecord": 90 },
+    "insurance": { "hasInsurance": true, "coverageAmount": 2e9, "aum": 1e11, "insurerReputation": 90, "isPubliclyVerifiable": true },
+    "regulatory": { "licenseCount": 20, "hasKycAml": true, "regulatoryViolations": 0, "jurisdictionQuality": 95, "hasLegalTransparency": true },
+    "openSource": { "hasRepository": true, "commitActivity": 50, "contributorCount": 200, "hasBugBounty": true },
+    "incidentHistory": { "totalIncidents": 0, "severityDistribution": { "critical": 0, "high": 0, "medium": 0, "low": 2 }, "avgResponseQuality": 90, "avgRecoveryDays": 0 }
+  },
+  "kraken": {
+    "trackRecord": { "yearsOperating": 14, "majorIncidents": 0, "volumeHandled": 1e12, "uptimePercent": 99.9, "communitySentiment": 82 },
+    "securityAudits": { "hasAudit": true, "auditCount": 2, "auditorName": "SOC 2", "auditorReputation": 80, "scopeCoverage": "full" },
+    "proofOfReserves": { "hasProof": true, "verificationMethod": "on_chain", "coverageRatio": 1.01, "liabilitiesScope": "all" },
+    "teamTransparency": { "namedMembers": 4, "verifiableProfiles": 3, "publicCommunications": 15, "hasLegalEntity": true, "teamTrackRecord": 85 },
+    "insurance": { "hasInsurance": true, "coverageAmount": 5e8, "aum": 5e10, "insurerReputation": 75, "isPubliclyVerifiable": true },
+    "regulatory": { "licenseCount": 10, "hasKycAml": true, "regulatoryViolations": 0, "jurisdictionQuality": 80, "hasLegalTransparency": true },
+    "openSource": { "hasRepository": false, "hasBugBounty": true },
+    "incidentHistory": { "totalIncidents": 0, "severityDistribution": { "critical": 0, "high": 0, "medium": 1, "low": 3 }, "avgResponseQuality": 85, "avgRecoveryDays": 0 }
+  },
+  "bybit": {
+    "trackRecord": { "yearsOperating": 5, "majorIncidents": 1, "volumeHandled": 1e12, "uptimePercent": 99.5, "communitySentiment": 70 },
+    "securityAudits": { "hasAudit": true, "auditCount": 2, "auditorName": "CertiK", "auditorReputation": 85, "scopeCoverage": "partial" },
+    "proofOfReserves": { "hasProof": true, "verificationMethod": "on_chain", "coverageRatio": 1.01, "liabilitiesScope": "all" },
+    "teamTransparency": { "namedMembers": 2, "verifiableProfiles": 1, "publicCommunications": 8, "hasLegalEntity": true, "teamTrackRecord": 65 },
+    "insurance": { "hasInsurance": true, "coverageAmount": 2e8, "aum": 3e10, "insurerReputation": 60, "isPubliclyVerifiable": true },
+    "regulatory": { "licenseCount": 5, "hasKycAml": true, "regulatoryViolations": 0, "jurisdictionQuality": 65, "hasLegalTransparency": true },
+    "openSource": { "hasRepository": false, "hasBugBounty": true },
+    "incidentHistory": { "totalIncidents": 1, "severityDistribution": { "critical": 1, "high": 0, "medium": 1, "low": 3 }, "avgResponseQuality": 70, "avgRecoveryDays": 14 }
+  },
+  "okx": {
+    "trackRecord": { "yearsOperating": 8, "majorIncidents": 0, "volumeHandled": 2e12, "uptimePercent": 99.8, "communitySentiment": 72 },
+    "securityAudits": { "hasAudit": true, "auditCount": 3, "auditorName": "SlowMist", "auditorReputation": 75, "scopeCoverage": "full" },
+    "proofOfReserves": { "hasProof": true, "verificationMethod": "on_chain", "coverageRatio": 1.02, "liabilitiesScope": "all" },
+    "teamTransparency": { "namedMembers": 2, "verifiableProfiles": 1, "publicCommunications": 6, "hasLegalEntity": true, "teamTrackRecord": 70 },
+    "insurance": { "hasInsurance": true, "coverageAmount": 3e8, "aum": 4e10, "insurerReputation": 65, "isPubliclyVerifiable": true },
+    "regulatory": { "licenseCount": 8, "hasKycAml": true, "regulatoryViolations": 0, "jurisdictionQuality": 70, "hasLegalTransparency": true },
+    "openSource": { "hasRepository": false, "hasBugBounty": true },
+    "incidentHistory": { "totalIncidents": 0, "severityDistribution": { "critical": 0, "high": 0, "medium": 0, "low": 2 }, "avgResponseQuality": 75, "avgRecoveryDays": 0 }
+  },
+  "bitfinex": {
+    "trackRecord": { "yearsOperating": 12, "majorIncidents": 1, "volumeHandled": 5e11, "uptimePercent": 99.5, "communitySentiment": 65 },
+    "securityAudits": { "hasAudit": true, "auditCount": 2, "auditorName": "Unknown", "auditorReputation": 50, "scopeCoverage": "partial" },
+    "proofOfReserves": { "hasProof": true, "verificationMethod": "attestation", "coverageRatio": 1.0, "liabilitiesScope": "partial" },
+    "teamTransparency": { "namedMembers": 2, "verifiableProfiles": 1, "publicCommunications": 5, "hasLegalEntity": true, "teamTrackRecord": 60 },
+    "insurance": { "hasInsurance": false, "isPubliclyVerifiable": false },
+    "regulatory": { "licenseCount": 3, "hasKycAml": true, "regulatoryViolations": 1, "jurisdictionQuality": 55, "hasLegalTransparency": true },
+    "openSource": { "hasRepository": false, "hasBugBounty": false },
+    "incidentHistory": { "totalIncidents": 1, "severityDistribution": { "critical": 1, "high": 0, "medium": 0, "low": 2 }, "avgResponseQuality": 60, "avgRecoveryDays": 30 }
+  },
+  "gate-io": {
+    "trackRecord": { "yearsOperating": 11, "majorIncidents": 0, "volumeHandled": 3e11, "uptimePercent": 99.7, "communitySentiment": 65 },
+    "securityAudits": { "hasAudit": true, "auditCount": 1, "auditorName": "SlowMist", "auditorReputation": 75, "scopeCoverage": "partial" },
+    "proofOfReserves": { "hasProof": true, "verificationMethod": "on_chain", "coverageRatio": 1.01, "liabilitiesScope": "all" },
+    "teamTransparency": { "namedMembers": 1, "verifiableProfiles": 0, "publicCommunications": 3, "hasLegalEntity": true, "teamTrackRecord": 50 },
+    "insurance": { "hasInsurance": false, "isPubliclyVerifiable": false },
+    "regulatory": { "licenseCount": 2, "hasKycAml": true, "regulatoryViolations": 0, "jurisdictionQuality": 50, "hasLegalTransparency": false },
+    "openSource": { "hasRepository": false, "hasBugBounty": true },
+    "incidentHistory": { "totalIncidents": 0, "severityDistribution": { "critical": 0, "high": 0, "medium": 0, "low": 1 }, "avgResponseQuality": 60, "avgRecoveryDays": 0 }
+  },
+  "kucoin": {
+    "trackRecord": { "yearsOperating": 7, "majorIncidents": 1, "volumeHandled": 2e11, "uptimePercent": 99.6, "communitySentiment": 68 },
+    "securityAudits": { "hasAudit": true, "auditCount": 1, "auditorName": "Unknown", "auditorReputation": 50, "scopeCoverage": "partial" },
+    "proofOfReserves": { "hasProof": true, "verificationMethod": "on_chain", "coverageRatio": 1.005, "liabilitiesScope": "partial" },
+    "teamTransparency": { "namedMembers": 1, "verifiableProfiles": 0, "publicCommunications": 4, "hasLegalEntity": true, "teamTrackRecord": 55 },
+    "insurance": { "hasInsurance": false, "isPubliclyVerifiable": false },
+    "regulatory": { "licenseCount": 2, "hasKycAml": true, "regulatoryViolations": 0, "jurisdictionQuality": 45, "hasLegalTransparency": false },
+    "openSource": { "hasRepository": false, "hasBugBounty": false },
+    "incidentHistory": { "totalIncidents": 1, "severityDistribution": { "critical": 1, "high": 0, "medium": 0, "low": 2 }, "avgResponseQuality": 55, "avgRecoveryDays": 10 }
+  },
+  "bitstamp": {
+    "trackRecord": { "yearsOperating": 14, "majorIncidents": 1, "volumeHandled": 2e11, "uptimePercent": 99.9, "communitySentiment": 78 },
+    "securityAudits": { "hasAudit": true, "auditCount": 3, "auditorName": "Deloitte", "auditorReputation": 95, "scopeCoverage": "full" },
+    "proofOfReserves": { "hasProof": true, "verificationMethod": "attestation", "coverageRatio": 1.01, "liabilitiesScope": "all" },
+    "teamTransparency": { "namedMembers": 4, "verifiableProfiles": 3, "publicCommunications": 12, "hasLegalEntity": true, "teamTrackRecord": 85 },
+    "insurance": { "hasInsurance": true, "coverageAmount": 3e8, "aum": 2e10, "insurerReputation": 80, "isPubliclyVerifiable": true },
+    "regulatory": { "licenseCount": 8, "hasKycAml": true, "regulatoryViolations": 0, "jurisdictionQuality": 85, "hasLegalTransparency": true },
+    "openSource": { "hasRepository": false, "hasBugBounty": false },
+    "incidentHistory": { "totalIncidents": 1, "severityDistribution": { "critical": 1, "high": 0, "medium": 0, "low": 1 }, "avgResponseQuality": 80, "avgRecoveryDays": 5 }
+  },
+  "gemini": {
+    "trackRecord": { "yearsOperating": 10, "majorIncidents": 0, "volumeHandled": 2e11, "uptimePercent": 99.9, "communitySentiment": 75 },
+    "securityAudits": { "hasAudit": true, "auditCount": 3, "auditorName": "SOC 2", "auditorReputation": 90, "scopeCoverage": "full" },
+    "proofOfReserves": { "hasProof": true, "verificationMethod": "attestation", "coverageRatio": 1.01, "liabilitiesScope": "all" },
+    "teamTransparency": { "namedMembers": 3, "verifiableProfiles": 3, "publicCommunications": 10, "hasLegalEntity": true, "teamTrackRecord": 85 },
+    "insurance": { "hasInsurance": true, "coverageAmount": 2e8, "aum": 1e10, "insurerReputation": 85, "isPubliclyVerifiable": true },
+    "regulatory": { "licenseCount": 12, "hasKycAml": true, "regulatoryViolations": 0, "jurisdictionQuality": 90, "hasLegalTransparency": true },
+    "openSource": { "hasRepository": false, "hasBugBounty": true },
+    "incidentHistory": { "totalIncidents": 0, "severityDistribution": { "critical": 0, "high": 0, "medium": 0, "low": 0 }, "avgResponseQuality": 90, "avgRecoveryDays": 0 }
+  },
+  "aave": {
+    "trackRecord": { "yearsOperating": 5, "majorIncidents": 0, "volumeHandled": 5e11, "uptimePercent": 99.9, "communitySentiment": 85 },
+    "securityAudits": { "hasAudit": true, "auditCount": 8, "auditorName": "Trail of Bits", "auditorReputation": 95, "scopeCoverage": "full" },
+    "proofOfReserves": { "hasProof": true, "verificationMethod": "on_chain", "coverageRatio": 1.0, "liabilitiesScope": "all" },
+    "teamTransparency": { "namedMembers": 5, "verifiableProfiles": 4, "publicCommunications": 20, "hasLegalEntity": true, "teamTrackRecord": 85 },
+    "insurance": { "hasInsurance": false, "isPubliclyVerifiable": false },
+    "regulatory": { "licenseCount": 0, "hasKycAml": false, "regulatoryViolations": 0, "jurisdictionQuality": 40, "hasLegalTransparency": true },
+    "openSource": { "hasRepository": true, "commitActivity": 100, "contributorCount": 150, "hasBugBounty": true },
+    "incidentHistory": { "totalIncidents": 0, "severityDistribution": { "critical": 0, "high": 0, "medium": 0, "low": 0 }, "avgResponseQuality": 90, "avgRecoveryDays": 0 }
+  },
+  "uniswap": {
+    "trackRecord": { "yearsOperating": 5, "majorIncidents": 0, "volumeHandled": 2e12, "uptimePercent": 99.9, "communitySentiment": 88 },
+    "securityAudits": { "hasAudit": true, "auditCount": 10, "auditorName": "Trail of Bits", "auditorReputation": 95, "scopeCoverage": "full" },
+    "proofOfReserves": { "hasProof": true, "verificationMethod": "on_chain", "coverageRatio": 1.0, "liabilitiesScope": "all" },
+    "teamTransparency": { "namedMembers": 5, "verifiableProfiles": 4, "publicCommunications": 15, "hasLegalEntity": true, "teamTrackRecord": 90 },
+    "insurance": { "hasInsurance": false, "isPubliclyVerifiable": false },
+    "regulatory": { "licenseCount": 0, "hasKycAml": false, "regulatoryViolations": 0, "jurisdictionQuality": 35, "hasLegalTransparency": true },
+    "openSource": { "hasRepository": true, "commitActivity": 80, "contributorCount": 200, "hasBugBounty": true },
+    "incidentHistory": { "totalIncidents": 0, "severityDistribution": { "critical": 0, "high": 0, "medium": 0, "low": 0 }, "avgResponseQuality": 85, "avgRecoveryDays": 0 }
+  },
+  "makerdao": {
+    "trackRecord": { "yearsOperating": 7, "majorIncidents": 0, "volumeHandled": 1e11, "uptimePercent": 99.9, "communitySentiment": 80 },
+    "securityAudits": { "hasAudit": true, "auditCount": 12, "auditorName": "Trail of Bits", "auditorReputation": 95, "scopeCoverage": "full" },
+    "proofOfReserves": { "hasProof": true, "verificationMethod": "on_chain", "coverageRatio": 1.02, "liabilitiesScope": "all" },
+    "teamTransparency": { "namedMembers": 10, "verifiableProfiles": 8, "publicCommunications": 25, "hasLegalEntity": true, "teamTrackRecord": 85 },
+    "insurance": { "hasInsurance": false, "isPubliclyVerifiable": false },
+    "regulatory": { "licenseCount": 0, "hasKycAml": false, "regulatoryViolations": 0, "jurisdictionQuality": 35, "hasLegalTransparency": true },
+    "openSource": { "hasRepository": true, "commitActivity": 60, "contributorCount": 100, "hasBugBounty": true },
+    "incidentHistory": { "totalIncidents": 0, "severityDistribution": { "critical": 0, "high": 0, "medium": 0, "low": 0 }, "avgResponseQuality": 85, "avgRecoveryDays": 0 }
+  },
+  "compound": {
+    "trackRecord": { "yearsOperating": 6, "majorIncidents": 0, "volumeHandled": 1e11, "uptimePercent": 99.9, "communitySentiment": 75 },
+    "securityAudits": { "hasAudit": true, "auditCount": 6, "auditorName": "OpenZeppelin", "auditorReputation": 95, "scopeCoverage": "full" },
+    "proofOfReserves": { "hasProof": true, "verificationMethod": "on_chain", "coverageRatio": 1.0, "liabilitiesScope": "all" },
+    "teamTransparency": { "namedMembers": 5, "verifiableProfiles": 4, "publicCommunications": 15, "hasLegalEntity": true, "teamTrackRecord": 80 },
+    "insurance": { "hasInsurance": false, "isPubliclyVerifiable": false },
+    "regulatory": { "licenseCount": 0, "hasKycAml": false, "regulatoryViolations": 0, "jurisdictionQuality": 35, "hasLegalTransparency": true },
+    "openSource": { "hasRepository": true, "commitActivity": 40, "contributorCount": 80, "hasBugBounty": true },
+    "incidentHistory": { "totalIncidents": 0, "severityDistribution": { "critical": 0, "high": 0, "medium": 0, "low": 0 }, "avgResponseQuality": 80, "avgRecoveryDays": 0 }
+  },
+  "lido": {
+    "trackRecord": { "yearsOperating": 4, "majorIncidents": 0, "volumeHandled": 2e10, "uptimePercent": 99.9, "communitySentiment": 78 },
+    "securityAudits": { "hasAudit": true, "auditCount": 5, "auditorName": "MixBytes", "auditorReputation": 80, "scopeCoverage": "full" },
+    "proofOfReserves": { "hasProof": true, "verificationMethod": "on_chain", "coverageRatio": 1.0, "liabilitiesScope": "all" },
+    "teamTransparency": { "namedMembers": 5, "verifiableProfiles": 3, "publicCommunications": 12, "hasLegalEntity": true, "teamTrackRecord": 75 },
+    "insurance": { "hasInsurance": false, "isPubliclyVerifiable": false },
+    "regulatory": { "licenseCount": 0, "hasKycAml": false, "regulatoryViolations": 0, "jurisdictionQuality": 30, "hasLegalTransparency": true },
+    "openSource": { "hasRepository": true, "commitActivity": 50, "contributorCount": 60, "hasBugBounty": true },
+    "incidentHistory": { "totalIncidents": 0, "severityDistribution": { "critical": 0, "high": 0, "medium": 0, "low": 0 }, "avgResponseQuality": 80, "avgRecoveryDays": 0 }
+  },
+  "stargate": {
+    "trackRecord": { "yearsOperating": 3, "majorIncidents": 0, "volumeHandled": 1e10, "uptimePercent": 99.5, "communitySentiment": 70 },
+    "securityAudits": { "hasAudit": true, "auditCount": 2, "auditorName": "Quantstamp", "auditorReputation": 80, "scopeCoverage": "full" },
+    "proofOfReserves": { "hasProof": true, "verificationMethod": "on_chain", "coverageRatio": 1.0, "liabilitiesScope": "all" },
+    "teamTransparency": { "namedMembers": 2, "verifiableProfiles": 1, "publicCommunications": 5, "hasLegalEntity": false, "teamTrackRecord": 60 },
+    "insurance": { "hasInsurance": false, "isPubliclyVerifiable": false },
+    "regulatory": { "licenseCount": 0, "hasKycAml": false, "regulatoryViolations": 0, "jurisdictionQuality": 25, "hasLegalTransparency": false },
+    "openSource": { "hasRepository": true, "commitActivity": 30, "contributorCount": 20, "hasBugBounty": false },
+    "incidentHistory": { "totalIncidents": 0, "severityDistribution": { "critical": 0, "high": 0, "medium": 0, "low": 0 }, "avgResponseQuality": 70, "avgRecoveryDays": 0 }
+  },
+  "metamask": {
+    "trackRecord": { "yearsOperating": 7, "majorIncidents": 0, "volumeHandled": 0, "uptimePercent": 99.9, "communitySentiment": 80 },
+    "securityAudits": { "hasAudit": true, "auditCount": 5, "auditorName": "Consensys Diligence", "auditorReputation": 85, "scopeCoverage": "full" },
+    "proofOfReserves": { "hasProof": false, "liabilitiesScope": "unknown" },
+    "teamTransparency": { "namedMembers": 3, "verifiableProfiles": 2, "publicCommunications": 10, "hasLegalEntity": true, "teamTrackRecord": 80 },
+    "insurance": { "hasInsurance": false, "isPubliclyVerifiable": false },
+    "regulatory": { "licenseCount": 0, "hasKycAml": false, "regulatoryViolations": 0, "jurisdictionQuality": 30, "hasLegalTransparency": true },
+    "openSource": { "hasRepository": true, "commitActivity": 200, "contributorCount": 300, "hasBugBounty": true },
+    "incidentHistory": { "totalIncidents": 0, "severityDistribution": { "critical": 0, "high": 0, "medium": 0, "low": 5 }, "avgResponseQuality": 80, "avgRecoveryDays": 0 }
+  },
+  "phantom": {
+    "trackRecord": { "yearsOperating": 4, "majorIncidents": 0, "volumeHandled": 0, "uptimePercent": 99.8, "communitySentiment": 82 },
+    "securityAudits": { "hasAudit": true, "auditCount": 3, "auditorName": "Neodyme", "auditorReputation": 75, "scopeCoverage": "full" },
+    "proofOfReserves": { "hasProof": false, "liabilitiesScope": "unknown" },
+    "teamTransparency": { "namedMembers": 3, "verifiableProfiles": 2, "publicCommunications": 8, "hasLegalEntity": true, "teamTrackRecord": 75 },
+    "insurance": { "hasInsurance": false, "isPubliclyVerifiable": false },
+    "regulatory": { "licenseCount": 0, "hasKycAml": false, "regulatoryViolations": 0, "jurisdictionQuality": 30, "hasLegalTransparency": true },
+    "openSource": { "hasRepository": true, "commitActivity": 80, "contributorCount": 50, "hasBugBounty": true },
+    "incidentHistory": { "totalIncidents": 0, "severityDistribution": { "critical": 0, "high": 0, "medium": 0, "low": 0 }, "avgResponseQuality": 80, "avgRecoveryDays": 0 }
+  },
+  "ledger": {
+    "trackRecord": { "yearsOperating": 10, "majorIncidents": 1, "volumeHandled": 0, "uptimePercent": 99.9, "communitySentiment": 80 },
+    "securityAudits": { "hasAudit": true, "auditCount": 4, "auditorName": "Matter Labs", "auditorReputation": 85, "scopeCoverage": "full" },
+    "proofOfReserves": { "hasProof": false, "liabilitiesScope": "unknown" },
+    "teamTransparency": { "namedMembers": 5, "verifiableProfiles": 4, "publicCommunications": 15, "hasLegalEntity": true, "teamTrackRecord": 80 },
+    "insurance": { "hasInsurance": true, "coverageAmount": 5e8, "insurerReputation": 70, "isPubliclyVerifiable": false },
+    "regulatory": { "licenseCount": 5, "hasKycAml": false, "regulatoryViolations": 0, "jurisdictionQuality": 75, "hasLegalTransparency": true },
+    "openSource": { "hasRepository": true, "commitActivity": 100, "contributorCount": 100, "hasBugBounty": true },
+    "incidentHistory": { "totalIncidents": 1, "severityDistribution": { "critical": 0, "high": 1, "medium": 0, "low": 0 }, "avgResponseQuality": 75, "avgRecoveryDays": 3 }
+  },
+  "trezor": {
+    "trackRecord": { "yearsOperating": 10, "majorIncidents": 0, "volumeHandled": 0, "uptimePercent": 99.9, "communitySentiment": 85 },
+    "securityAudits": { "hasAudit": true, "auditCount": 3, "auditorName": "List of audits", "auditorReputation": 80, "scopeCoverage": "full" },
+    "proofOfReserves": { "hasProof": false, "liabilitiesScope": "unknown" },
+    "teamTransparency": { "namedMembers": 4, "verifiableProfiles": 3, "publicCommunications": 12, "hasLegalEntity": true, "teamTrackRecord": 85 },
+    "insurance": { "hasInsurance": false, "isPubliclyVerifiable": false },
+    "regulatory": { "licenseCount": 0, "hasKycAml": false, "regulatoryViolations": 0, "jurisdictionQuality": 50, "hasLegalTransparency": true },
+    "openSource": { "hasRepository": true, "commitActivity": 30, "contributorCount": 40, "hasBugBounty": true },
+    "incidentHistory": { "totalIncidents": 0, "severityDistribution": { "critical": 0, "high": 0, "medium": 0, "low": 0 }, "avgResponseQuality": 85, "avgRecoveryDays": 0 }
+  },
+  "bitgo": {
+    "trackRecord": { "yearsOperating": 11, "majorIncidents": 0, "volumeHandled": 1e11, "uptimePercent": 99.9, "communitySentiment": 78 },
+    "securityAudits": { "hasAudit": true, "auditCount": 3, "auditorName": "SOC 2", "auditorReputation": 90, "scopeCoverage": "full" },
+    "proofOfReserves": { "hasProof": true, "verificationMethod": "attestation", "coverageRatio": 1.01, "liabilitiesScope": "all" },
+    "teamTransparency": { "namedMembers": 5, "verifiableProfiles": 4, "publicCommunications": 10, "hasLegalEntity": true, "teamTrackRecord": 85 },
+    "insurance": { "hasInsurance": true, "coverageAmount": 5e8, "aum": 6e10, "insurerReputation": 80, "isPubliclyVerifiable": true },
+    "regulatory": { "licenseCount": 8, "hasKycAml": true, "regulatoryViolations": 0, "jurisdictionQuality": 80, "hasLegalTransparency": true },
+    "openSource": { "hasRepository": true, "commitActivity": 20, "contributorCount": 30, "hasBugBounty": true },
+    "incidentHistory": { "totalIncidents": 0, "severityDistribution": { "critical": 0, "high": 0, "medium": 0, "low": 0 }, "avgResponseQuality": 85, "avgRecoveryDays": 0 }
+  },
+  "fireblocks": {
+    "trackRecord": { "yearsOperating": 7, "majorIncidents": 0, "volumeHandled": 2e11, "uptimePercent": 99.9, "communitySentiment": 80 },
+    "securityAudits": { "hasAudit": true, "auditCount": 4, "auditorName": "SOC 2", "auditorReputation": 90, "scopeCoverage": "full" },
+    "proofOfReserves": { "hasProof": false, "liabilitiesScope": "unknown" },
+    "teamTransparency": { "namedMembers": 4, "verifiableProfiles": 3, "publicCommunications": 10, "hasLegalEntity": true, "teamTrackRecord": 85 },
+    "insurance": { "hasInsurance": true, "coverageAmount": 1e8, "insurerReputation": 75, "isPubliclyVerifiable": true },
+    "regulatory": { "licenseCount": 10, "hasKycAml": true, "regulatoryViolations": 0, "jurisdictionQuality": 80, "hasLegalTransparency": true },
+    "openSource": { "hasRepository": false, "hasBugBounty": true },
+    "incidentHistory": { "totalIncidents": 0, "severityDistribution": { "critical": 0, "high": 0, "medium": 0, "low": 0 }, "avgResponseQuality": 85, "avgRecoveryDays": 0 }
+  },
+  "copper": {
+    "trackRecord": { "yearsOperating": 7, "majorIncidents": 0, "volumeHandled": 5e10, "uptimePercent": 99.8, "communitySentiment": 72 },
+    "securityAudits": { "hasAudit": true, "auditCount": 2, "auditorName": "SOC 2", "auditorReputation": 85, "scopeCoverage": "full" },
+    "proofOfReserves": { "hasProof": true, "verificationMethod": "attestation", "coverageRatio": 1.0, "liabilitiesScope": "all" },
+    "teamTransparency": { "namedMembers": 3, "verifiableProfiles": 2, "publicCommunications": 6, "hasLegalEntity": true, "teamTrackRecord": 75 },
+    "insurance": { "hasInsurance": true, "coverageAmount": 1e8, "insurerReputation": 70, "isPubliclyVerifiable": false },
+    "regulatory": { "licenseCount": 5, "hasKycAml": true, "regulatoryViolations": 0, "jurisdictionQuality": 70, "hasLegalTransparency": true },
+    "openSource": { "hasRepository": false, "hasBugBounty": false },
+    "incidentHistory": { "totalIncidents": 0, "severityDistribution": { "critical": 0, "high": 0, "medium": 0, "low": 0 }, "avgResponseQuality": 75, "avgRecoveryDays": 0 }
+  },
+  "curve": {
+    "trackRecord": { "yearsOperating": 5, "majorIncidents": 1, "volumeHandled": 5e11, "uptimePercent": 99.5, "communitySentiment": 82 },
+    "securityAudits": { "hasAudit": true, "auditCount": 5, "auditorName": "Trail of Bits", "auditorReputation": 95, "scopeCoverage": "full" },
+    "proofOfReserves": { "hasProof": true, "verificationMethod": "on_chain", "coverageRatio": 1.0, "liabilitiesScope": "all" },
+    "teamTransparency": { "namedMembers": 2, "verifiableProfiles": 1, "publicCommunications": 8, "hasLegalEntity": true, "teamTrackRecord": 80 },
+    "insurance": { "hasInsurance": false, "isPubliclyVerifiable": false },
+    "regulatory": { "licenseCount": 0, "hasKycAml": false, "regulatoryViolations": 0, "jurisdictionQuality": 30, "hasLegalTransparency": true },
+    "openSource": { "hasRepository": true, "commitActivity": 60, "contributorCount": 80, "hasBugBounty": true },
+    "incidentHistory": { "totalIncidents": 1, "severityDistribution": { "critical": 1, "high": 0, "medium": 0, "low": 0 }, "avgResponseQuality": 80, "avgRecoveryDays": 2 }
+  },
+  "sushiswap": {
+    "trackRecord": { "yearsOperating": 4, "majorIncidents": 1, "volumeHandled": 1e11, "uptimePercent": 99.5, "communitySentiment": 70 },
+    "securityAudits": { "hasAudit": true, "auditCount": 3, "auditorName": "Peckshield", "auditorReputation": 80, "scopeCoverage": "partial" },
+    "proofOfReserves": { "hasProof": true, "verificationMethod": "on_chain", "coverageRatio": 1.0, "liabilitiesScope": "all" },
+    "teamTransparency": { "namedMembers": 2, "verifiableProfiles": 1, "publicCommunications": 5, "hasLegalEntity": true, "teamTrackRecord": 65 },
+    "insurance": { "hasInsurance": false, "isPubliclyVerifiable": false },
+    "regulatory": { "licenseCount": 0, "hasKycAml": false, "regulatoryViolations": 0, "jurisdictionQuality": 25, "hasLegalTransparency": false },
+    "openSource": { "hasRepository": true, "commitActivity": 40, "contributorCount": 50, "hasBugBounty": false },
+    "incidentHistory": { "totalIncidents": 1, "severityDistribution": { "critical": 1, "high": 0, "medium": 0, "low": 1 }, "avgResponseQuality": 65, "avgRecoveryDays": 5 }
+  },
+  "anchorage": {
+    "trackRecord": { "yearsOperating": 8, "majorIncidents": 0, "volumeHandled": 5e10, "uptimePercent": 99.9, "communitySentiment": 75 },
+    "securityAudits": { "hasAudit": true, "auditCount": 3, "auditorName": "SOC 2", "auditorReputation": 90, "scopeCoverage": "full" },
+    "proofOfReserves": { "hasProof": true, "verificationMethod": "attestation", "coverageRatio": 1.01, "liabilitiesScope": "all" },
+    "teamTransparency": { "namedMembers": 4, "verifiableProfiles": 3, "publicCommunications": 8, "hasLegalEntity": true, "teamTrackRecord": 80 },
+    "insurance": { "hasInsurance": true, "coverageAmount": 2e8, "insurerReputation": 80, "isPubliclyVerifiable": true },
+    "regulatory": { "licenseCount": 12, "hasKycAml": true, "regulatoryViolations": 0, "jurisdictionQuality": 85, "hasLegalTransparency": true },
+    "openSource": { "hasRepository": false, "hasBugBounty": false },
+    "incidentHistory": { "totalIncidents": 0, "severityDistribution": { "critical": 0, "high": 0, "medium": 0, "low": 0 }, "avgResponseQuality": 85, "avgRecoveryDays": 0 }
+  },
+  "trust-wallet": {
+    "trackRecord": { "yearsOperating": 7, "majorIncidents": 0, "volumeHandled": 0, "uptimePercent": 99.8, "communitySentiment": 78 },
+    "securityAudits": { "hasAudit": true, "auditCount": 3, "auditorName": "Kudelski", "auditorReputation": 80, "scopeCoverage": "full" },
+    "proofOfReserves": { "hasProof": false, "liabilitiesScope": "unknown" },
+    "teamTransparency": { "namedMembers": 3, "verifiableProfiles": 2, "publicCommunications": 8, "hasLegalEntity": true, "teamTrackRecord": 75 },
+    "insurance": { "hasInsurance": false, "isPubliclyVerifiable": false },
+    "regulatory": { "licenseCount": 0, "hasKycAml": false, "regulatoryViolations": 0, "jurisdictionQuality": 30, "hasLegalTransparency": true },
+    "openSource": { "hasRepository": true, "commitActivity": 40, "contributorCount": 30, "hasBugBounty": true },
+    "incidentHistory": { "totalIncidents": 0, "severityDistribution": { "critical": 0, "high": 0, "medium": 0, "low": 0 }, "avgResponseQuality": 75, "avgRecoveryDays": 0 }
+  }
+}
