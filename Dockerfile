@@ -15,6 +15,7 @@ RUN npm ci --omit=dev
 COPY --from=builder /app/dist ./dist
 COPY methodology ./methodology
 COPY public ./public
+COPY data ./data
 
 ENV NODE_ENV=production
 EXPOSE 3000

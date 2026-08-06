@@ -1,10 +1,38 @@
 import { buildApp } from './app.js';
 import { getConfig } from './config/index.js';
 import { getLogger } from './utils/logger.js';
+import { getDb } from './config/database.js';
+import { services } from './db/schema/services.js';
+
+async function seedIfNeeded() {
+  const db = getDb();
+  const [existing] = await db.select({ id: services.id }).from(services).limit(1);
+  if (existing) return false;
+
+  const logger = getLogger();
+  logger.info('Database empty — running seed...');
+
+  const { execSync } = await import('child_process');
+  execSync('npm run seed', { stdio: 'inherit', cwd: process.cwd() });
+  return true;
+}
+
+async function scoreAll() {
+  const logger = getLogger();
+  logger.info('Scoring all services...');
+
+  const { scoreAllServices } = await import('./modules/services/service.service.js');
+  const results = await scoreAllServices();
+  const scored = results.filter((r: any) => r.success).length;
+  logger.info(`Scored ${scored}/${results.length} services`);
+}
 
 async function main() {
   const config = getConfig();
   const logger = getLogger();
+
+  await seedIfNeeded();
+  await scoreAll();
 
   const app = await buildApp();
 

@@ -1,0 +1,22 @@
+services:
+  - type: web
+    name: woebegone-trust-registry
+    runtime: image
+    image:
+      url: https://github.com/BluCrest/woebegone-trust.git
+      branch: main
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3000
+      - key: DATABASE_URL
+        value: data/registry.db
+      - key: API_KEY
+        generateValue: true
+      - key: JWT_SECRET
+        generateValue: true
+    healthCheckPath: /v1/health
+    disk:
+      mountPath: /opt/render/project/data
+      sizeGB: 1
