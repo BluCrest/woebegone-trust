@@ -17,22 +17,11 @@ async function seedIfNeeded() {
   return true;
 }
 
-async function scoreAll() {
-  const logger = getLogger();
-  logger.info('Scoring all services...');
-
-  const { scoreAllServices } = await import('./modules/services/service.service.js');
-  const results = await scoreAllServices();
-  const scored = results.filter((r: any) => r.success).length;
-  logger.info(`Scored ${scored}/${results.length} services`);
-}
-
 async function main() {
   const config = getConfig();
   const logger = getLogger();
 
   await seedIfNeeded();
-  await scoreAll();
 
   const app = await buildApp();
 

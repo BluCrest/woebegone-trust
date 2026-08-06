@@ -3,7 +3,6 @@ import { getDb } from '../../config/database.js';
 import { services, type ServiceCategory } from '../../db/schema/services.js';
 import { serviceScores, scoreHistory } from '../../db/schema/scores.js';
 import { dataPoints } from '../../db/schema/data-points.js';
-import { collectServiceData } from '../data-collection/aggregator.js';
 import { calculateTrustScore } from '../scoring/scoring.engine.js';
 
 export interface ListOptions {
@@ -287,31 +286,16 @@ export async function getLeaderboard(options: {
  * collect data → calculate score → write to database
  */
 export async function scoreService(serviceId: string) {
-  const db = getDb();
   const service = await getServiceById(serviceId);
   if (!service) return null;
 
-  const { factorData, rawData } = await collectServiceData({
+  // Real-time audit — probes live infrastructure against 20 security questions
+  const score = await calculateTrustScore(serviceId, {
     id: service.id,
     name: service.name,
     website: service.website || undefined,
-    addresses: typeof service.addresses === 'string' ? JSON.parse(service.addresses) : service.addresses || {},
+    category: service.category || undefined,
   });
-
-  // Store raw data points
-  for (const point of rawData) {
-    await db.insert(dataPoints).values({
-      id: `${serviceId}-${point.source}-${point.dataType}-${Date.now()}`,
-      serviceId,
-      category: point.dataType,
-      source: point.source,
-      data: JSON.stringify(point.data),
-      confidence: point.confidence,
-    });
-  }
-
-  // Calculate trust score
-  const score = await calculateTrustScore(serviceId, factorData);
 
   // Write score to database
   await updateServiceScore(serviceId, {
